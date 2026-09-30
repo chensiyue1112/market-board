@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>股吧</title>
+<link rel="stylesheet" href="assets/gubapage.css?v=09301949">
+<!-- ★★ 2026-09-28：本页＝**整合淘股吧（tgb.cn）当日的收盘总结帖、由 AI 总结**（用户提的新页）。
+     数据：`data/guba.js`（`window.GUBA`，由 `pipeline/tools/export_guba.py` 生成）
+     样式：`assets/gubapage.css`　渲染：`assets/comp-guba.js`
+     ⚠ 分工（《需求文档》§4）：**取数是脚本**（`pipeline/ingest_tgb.py` → `tgb_post`）、
+       **总结与判断是 AI**（`pipeline/guba_note.py` → `tgb_summary`）。
+     ⚠ 页面呈现的是**一群人的复盘**（共识与分歧），**不是本系统的判断**；
+       引用可以点开原帖。流程见 `docs/股吧.md`。
+     ⚠ 改版式请改那两个共享文件，别在本页里另写一份。 -->
+<!-- ★ 2026-09-30 手机适配层（小米/HyperOS 观感 ＋ 小米浏览器已知坑）：见 assets/mobile.css 头部说明。
+     ⚠ 必须排在 gubapage.css **之后**（同特异性下后者胜）；桌面规则一律在媒体查询里，不受影响。 -->
+<link rel="stylesheet" href="assets/mobile.css?v=09301949">
+</head>
+<body>
+<div class="hdr"><nav>
+  <a href="index.html">每日页</a>
+  <a href="sector.html">概念观察</a>
+  <a href="boxos.html">超卖</a>
+  <a href="boxfol.html">跟随</a>
+  <a href="news.html">消息</a>
+  <a href="guba.html" class="on">股吧</a>
+</nav></div>
+<div class="wrap">
+  <h1>股吧 · 淘股吧复盘整合</h1>
+  <div class="sub">数据日 <b id="dday">—</b>　｜　<b id="cnt">—</b></div>
+  <div class="datebar">
+    <button id="prev" type="button" title="前一天">←</button>
+    <select id="dsel" aria-label="选择日期"></select>
+    <button id="next" type="button" title="后一天">→</button>
+    <button id="latest" type="button" title="回到最新一天">最新</button>
+    <span class="pos" id="pos"></span>
+  </div>
+  <div id="view"></div>
+</div>
+<script src="data/guba.js?v=09301949"></script>
+<script src="assets/comp-guba.js?v=09301949"></script>
+<!-- ★ 2026-09-30 手机端：把原生 `<select>` 换成**可控的小米风格下拉** ——
+     ⚠ **零改动页面 JS**：原生 select 仍是状态源，脚本只读它的 options/value、选完派发 change。
+     只作用在 ≤680px（桌面由 CSS 决定不显示），见 assets/m-select.js 头部说明。 -->
+<script src="assets/m-select.js?v=09301949"></script>
+</body>
+</html>

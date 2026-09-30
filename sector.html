@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>市场状态判断系统 · 概念观察</title>
+<link rel="stylesheet" href="assets/ui.css?v=09301949">
+<!-- ★ 2026-09-30 手机适配层（小米/HyperOS 观感 ＋ 小米浏览器已知坑）：见 assets/mobile.css 头部说明。
+     ⚠ 必须排在 ui.css **之后**（同特异性下后者胜）；桌面规则一律在媒体查询里，不受影响。 -->
+<link rel="stylesheet" href="assets/mobile.css?v=09301949">
+</head>
+<body>
+
+<header>
+  <div class="hdr">
+    <h1>市场状态判断系统</h1>
+    <nav>
+      <a href="index.html">每日页</a>
+      <a href="sector.html" class="on">概念观察</a>
+      <a href="boxos.html">超卖</a>
+      <a href="boxfol.html">跟随</a>
+      <a href="news.html">消息</a>
+      <a href="guba.html">股吧</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- **页头**：日期切换 + 当日总览（一眼得到"今天是什么日子"）。
+       2026-09-16 用户："只有观察区做的好，保留观察区，放在最上面。其他的给我重构或者删除。"
+       ＋（对起爆雷达/榜外涨停股）"这些不要了。" —— 那两块已删：起爆名单每日页有，
+       榜外涨停股仍在 `report_block.py` 里查得到，只是不再铺在页面上。 -->
+  <!-- ★ 2026-09-22：这里原来是 `<div class="card"><h2>板块观察 · …</h2>…</div>` ——
+       用户："把板块观察里面**板块观察那一个没用内容的框**删除"。
+       ⚠ 但**日期切换器装在里面**（‹ 日期 ›，翻历史某天用），不能跟着删；
+       用户选的方案是「**去掉卡壳，日期切换器留成一行**」。
+       → 卡壳与「板块观察」这个标题（与页面名重复）去掉，内容改成页头下的一行。 -->
+  <div class="dayline">
+    <span class="daybar">
+      <button class="mini" id="sPrev" title="前一交易日">‹</button>
+      <select id="sDay"></select>
+      <button class="mini" id="sNext" title="后一交易日">›</button>
+    </span>
+    <span class="phline" id="sHead"></span>
+  </div>
+  <div class="warnbox" id="sDayWarn"></div>
+  <div class="srcnote" id="sNote"></div>
+
+  <!-- ⚠ **「观察区」卡 2026-09-22 已删**（用户："还有观察区删除"）。
+       连带：`comp-sector.js` 里那两行渲染加了 `el()` 存在性判断 ——
+       `el()` 是 `document.getElementById` 且**没有 null 保护**，直接删卡会让整个渲染抛 TypeError。
+       ⚠ 用户圈定的清单**仍在 localStorage 里**（`load()` 没动），也在 `S.observe` 数据里；
+       只是页面上不再有那一块。要恢复：把这张卡加回来即可。 -->
+
+  <!-- 3 ② ETF 异动 → 板块（**一个主题一行，两段**：上面＝最强的那只 ETF，下面＝它指的板块） -->
+  <div class="card card--sig">
+    <h2>ETF 异动 <span class="ph" title="连阳＝连续 N 天 收 > 开（日内收阳，不等于对昨收上涨）">ETF 当日 ≥3% 或 连阳 ≥3 天</span></h2>
+    <div id="sE"></div>
+  </div>
+
+  <!-- 4 涨停板（信号源①；每只涨停股先归入唯一方向，再按归入只数排；**只铺前 5 个方向**） -->
+  <div class="card card--pool">
+    <h2>涨停板 <span class="ph">每只涨停股只算一次 · 前 5 个方向</span></h2>
+    <div id="sCand"></div>
+  </div>
+
+  <!-- 5 新冒出（独立成卡） -->
+  <div class="card card--pool">
+    <h2>新冒出 <span class="ph">当日进榜 且 近 5 日未上榜</span></h2>
+    <div id="sNew"></div>
+  </div>
+
+  <!-- 6 出头鸟（**前 5 个方向，概念胶囊**；点开弹窗看是哪几只票） -->
+  <div class="card card--stk">
+    <h2>出头鸟 <span class="ph">连板 ≥2 · 前 5 个方向</span></h2>
+    <div id="sLead"></div>
+  </div>
+
+  <!-- 7 ⑥ 新 ETF -->
+  <div class="card card--sig">
+    <h2>新 ETF 上新 <span class="ph">上市 ≤60 天</span></h2>
+    <div id="sN"></div>
+  </div>
+
+  <div class="foot">板块观察 v0.1 · 数据＝同花顺涨停聚类本地库（data/market.db）｜纯素材，不预测、不指导</div></div>
+
+<!-- 明细小窗口（2026-09-16：**所有"点开"都弹它**，不再原地折叠展开 —— 用户："点击展开的是要额外
+     弹出来一个页面，而不是折叠展开。点开可以展示今日涨停的票，但是仅仅展示，再带个属性，
+     比如连扳多少板或者几天几板，就足够了，别说一堆废话。"） -->
+<div class="modal" id="sxModal">
+  <div class="mback" data-sxclose="1"></div>
+  <div class="mpanel">
+    <div class="mhead">
+      <span id="sxMTitle"></span>
+      <span class="mclose" data-sxclose="1" title="关闭（Esc）">✕</span>
+    </div>
+    <div class="mbody" id="sxMBody"></div>
+  </div>
+</div>
+
+<!-- ETF 走势小窗口（2026-09-15 用户："我点击展开的信息修改成一个悬空的折线图，是这个etf近10天，30天，100天的走势，
+     是交易日的。跟情绪区一样可以切换。"）：点观察区那张卡 → 悬空折线图，面板右上角切 10/30/100 个交易日 -->
+<div class="modal" id="etfModal">
+  <div class="mback" data-etfclose="1"></div>
+  <div class="mpanel">
+    <div class="mhead">
+      <span id="etfMTitle"></span>
+      <span class="seg seg-s" id="etfMSeg">
+        <button id="etf-s-10" data-etfn="10" class="on">10</button><button id="etf-s-30" data-etfn="30">30</button><button id="etf-s-100" data-etfn="100">100</button>
+      </span>
+      <span class="mclose" data-etfclose="1" title="关闭（Esc）">✕</span>
+    </div>
+    <div class="mbody" id="etfMBody"></div>
+  </div>
+</div>
+
+<script src="assets/echarts.min.js?v=09301949"></script>
+<script src="data/sector.js?v=09301949"></script>
+<script src="assets/comp-sector.js?v=09301949"></script>
+<!-- ★ 2026-09-30 手机端：把原生 `<select>` 换成**可控的小米风格下拉** ——
+     ⚠ **零改动页面 JS**：原生 select 仍是状态源，脚本只读它的 options/value、选完派发 change。
+     只作用在 ≤680px（桌面由 CSS 决定不显示），见 assets/m-select.js 头部说明。 -->
+<script src="assets/m-select.js?v=09301949"></script>
+</body>
+</html>

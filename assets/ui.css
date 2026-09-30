@@ -1,0 +1,408 @@
+/* 市场状态判断系统 · 站点基础样式（每日页 / 板块观察 / 后续各页共用） */
+  body{margin:0;font-family:"Microsoft YaHei",system-ui,sans-serif;background:#eef0f3;color:#23262b}
+  .wrap{max-width:1100px;margin:0 auto;padding:12px 16px 60px}
+
+  header{background:#1f2430;color:#fff;padding:10px 0}
+  .hdr{max-width:1100px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .hdr h1{font-size:15px;margin:0}
+  nav{display:flex;gap:4px;margin-left:auto}
+  nav a{color:#cfd4dd;text-decoration:none;font-size:13px;padding:5px 12px;border-radius:7px}
+  nav a.on{background:#364152;color:#fff}
+  nav a.off{color:#6a7280;cursor:not-allowed}
+
+  .hint{font-size:12px;color:#adb5bd;margin:12px 0;line-height:1.7}
+  .card{background:#fff;border:1px solid #e6e8ec;border-radius:12px;padding:16px;margin-bottom:14px}
+  .card h2{font-size:14px;font-weight:600;margin:0 0 14px;color:#495057}
+  .card .ph{color:#ced4da;font-size:12px;font-weight:400}
+  .seg{display:inline-flex;border:1px solid #d4d8de;border-radius:7px;overflow:hidden;vertical-align:middle}
+  .seg button{background:#fff;border:0;padding:3px 12px;font-size:12px;cursor:pointer;color:#4a5560}
+  .seg button.on{background:#1c7ed6;color:#fff}
+  .up{color:#e03131}.down{color:#2f9e44}.dim{color:#868e96;font-size:12px;font-weight:400}
+  /* 情绪区那一行里「赚钱效应」是可点开的（点开看逐日趋势，2026-09-18 加）——
+     只做一个极轻的提示：虚线下划 + 一个小 ›，不加任何文字说明（用户不喜欢行内废话）。 */
+  .premOpen{cursor:pointer;border-bottom:1px dashed #d4d8de}
+  .premOpen:hover{border-bottom-color:#1c7ed6}
+  .premCue{color:#adb5bd;font-style:normal;font-size:11px}
+  .srcnote{font-size:11px;color:#adb5bd;margin-top:8px}
+  /* ⚠ `.offhd/.offlist/.offrow`（"没进前 20 个方向的涨停股"那一块）2026-09-16 随该块一起删了
+     —— 用户："这些不要了。" 数据仍在 `S.breadth.off` 里，`report_block.py` 也能查。 */
+  .tgl{font-size:11px;border:1px solid #d4d8de;border-radius:6px;padding:2px 10px;cursor:pointer;color:#868e96;background:#fff;margin-left:auto;white-space:nowrap}
+  .tgl.on{background:#868e96;color:#fff;border-color:#868e96}
+
+  /* —— 大盘速览组件 —— */
+  .ov{display:flex;flex-wrap:wrap;gap:10px 34px;align-items:baseline}
+  .ov .blk{min-width:150px}
+  .ov .nm{font-size:12px;color:#868e96;display:block;margin-bottom:2px}
+  .ov .big{font-size:22px;font-weight:700;font-family:"Segoe UI",Arial,sans-serif}
+  .ov .sub{font-size:12px;color:#868e96;margin-top:2px}
+  .volhd{display:flex;align-items:center;gap:12px;margin:14px 0 6px}
+  /* 成交额图：150 → 176px（2026-09-15 用户："量能图也在纵轴放明显点"）→ **240px**
+     （2026-09-22 用户："纵轴可以再拉长点"）。纵轴是**绝对量**（亿元、必须从 0 起），
+     所以"看得清波动"只能靠**给足高度**，不能靠截断值域。 */
+  #volChart{height:240px;width:100%}
+  /* 当前尺度里的位置（最高/最低/今天处在哪） */
+  .volpos{font-size:11.5px;color:#868e96;margin-top:6px;line-height:1.7}
+  .volpos b{color:#23262b;font-variant-numeric:tabular-nums}
+  .volpos b.up{color:#e03131}.volpos b.down{color:#2f9e44}
+
+  /* —— 大盘速览：微型走势（sparkline）—— */
+  .spark{width:84px;height:26px;display:inline-block;vertical-align:middle}
+  .ov .blk{min-width:170px}
+  .vlab{font-size:11px;color:#adb5bd;margin-top:2px}
+  .warnbox{font-size:11px;color:#a15c00;background:#fff4e6;border:1px solid #ffd8a8;border-radius:7px;padding:4px 9px;margin-top:8px;display:none}
+  .chk{font-size:11px;color:#2f9e44;margin-top:4px}
+
+  /* —— 情绪区四框 —— */
+  .emo .hint{font-size:10px;color:#ced4da;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* 图高：66px 太扁（看不出形态）→ 108px → **2026-09-15 起 168px**：
+     用户要"纵轴明显一点"，四框改成**一行一个**（宽度也够），纵轴刻度才有空间看清。 */
+  .spark2{width:100%;height:168px;margin-top:6px}
+  .sub2{font-size:11px;color:#868e96;margin-top:4px;min-height:14px}
+  .sub2 b{color:#495057}
+  .gapnote{font-size:10px;color:#b197fc;margin-top:2px}
+  .tagr{font-size:10px;color:#adb5bd;border:1px solid #e9ecef;border-radius:5px;padding:0 4px;margin-left:4px;white-space:nowrap}
+  /* **一行一个图**（2026-09-15 用户："涨停强度那情绪区的四个图，可以放大一点，变成一行只要一个图，
+     其实我只是想让他的纵轴明显一点。"）—— 2×2 时每格只有半屏宽、图又矮，纵轴刻度挤在一起看不清。 */
+  .emogrid{display:grid;grid-template-columns:1fr;gap:12px}
+  .emo{border:1px solid #f1f3f5;border-radius:10px;padding:10px 12px 8px;background:#fbfcfd;display:flex;flex-direction:column}
+  .emo .top{display:flex;align-items:baseline;gap:10px;white-space:nowrap;overflow:hidden}
+  .emo .t{font-size:12px;color:#868e96}
+  .emo .n{font-size:22px;font-weight:700;font-family:"Segoe UI",Arial,sans-serif}
+  .emo .d{font-size:12px;color:#868e96;padding-left:6px}
+  .emo .ec{flex:1;min-height:104px;margin-top:2px}
+  /* 每个子图**右上角**自己的 30/60/180 档位（2026-09-15 用户："放在每个子图的右上角，单独管理"） */
+  .seg-s{margin-left:auto;align-self:center}
+  .seg-s button{font-size:11px;padding:1px 6px}
+
+  /* 占位卡样式：新页（sector / macro / archives）建好后用于标注"待建"区块 */
+  .ph-card{border:1px dashed #ced4da;min-height:80px}
+  .foot{color:#adb5bd;font-size:12px;text-align:center;margin-top:24px}
+
+  /* —— 板块观察页 ——
+     排版与信息层级规范（v0.83，参考 NHS 数据看板规范：Typography / Tables / KPIs 三节）：
+       1) **三级字号**：卡片标题 13/600 ｜ 主锚点（板块名）14/700 ｜ 数值 13/600 ｜ 指标标签 10/灰 ｜ 口径 11/浅灰
+       2) **数值成列**：等宽数字（tabular-nums）+ 固定宽度 + 右对齐 —— 扫视时数值对齐，眼睛不用跳
+       3) **一个指标＝小标签＋值**（`.m > i + b`）：标签定宽在前、值在后 → 列自然对齐；
+          **不用边框分隔，靠留白分列**（NHS：Minimal use of borders, white space is used to separate columns）
+       4) **颜色只管两件事**：涨跌（红/绿）、状态（`.tag` 浅底胶囊）；其余一律灰阶（避免颜色抢视线）
+       5) **卡片分族**：族内**完全一致**、族间**一眼可分**（靠左侧色条+底色，不靠标题写法差异）
+            .card--own 观察区（你自己的）｜.card--pool 方向池（涨停板/新冒出，行结构完全相同）
+            .card--sig 外部信号源（②/⑥）｜.card--cmp 图表族（重点对比）｜.card--stk 个股族（出头鸟）
+       6) 间距一律 8px 栅格：行内 gap 10px、卡片 14px、分组上间距 10px */
+  .card--own{border-left:3px solid #4dabf7;background:#f8fbff}
+  .card--pool{border-left:3px solid #ffd43b}
+  .card--sig{border-left:3px solid #b197fc}
+  .card--cmp{border-left:3px solid #63e6be}
+  .card--stk{border-left:3px solid #ffa8a8}
+  .card--file{border-left:3px solid #ffc078}   /* 档案族：板块档案库 */
+  .card--macro{border-left:3px solid #74c0fc}   /* 宏观族：外围宏观页 */
+  /* 提醒族（每日页「今日提醒」/ 板块观察页「起爆雷达·风险雷达」） */
+  .card--alert{border-left:3px solid #ff6b6b}
+  /* 提醒层：信号有效性回看（回看表收进展开，正文只留一句相对结论） */
+  .validity{margin-top:8px;border-top:1px dashed #e9ecef;padding-top:6px}
+  .validity summary{font-size:11px;color:#adb5bd;cursor:pointer;outline:none;list-style:none}
+  .validity summary::after{content:" ▾";color:#ced4da}
+  .validity[open] summary::after{content:" ▴"}
+  .validity summary:hover{color:#868e96}
+  .vt{border-collapse:collapse;width:100%;margin-top:6px;font-size:12px}
+  .vt th,.vt td{padding:3px 6px;text-align:right;border-bottom:1px solid #f1f3f5;
+                font-variant-numeric:tabular-nums}
+  .vt th:first-child,.vt td:first-child{text-align:left}
+  .vt th{font-size:10px;color:#adb5bd;font-weight:400}
+  .vt tr.hl td{background:#f8f9fa;font-weight:600}
+  .vnote{font-size:11px;color:#adb5bd;margin-top:6px;line-height:1.6}
+  .vconc{font-size:12.5px;color:#23262b;line-height:1.7;margin-top:4px}
+  .alconc{background:#fff5f5;border-left:2px solid #ffa8a8;border-radius:0 8px 8px 0;
+    padding:6px 10px;margin:6px 0 4px}
+  .alconc .evimp{color:#c92a2a;font-size:12.5px}
+  /* 解读小窗口（外围宏观 · 点任意条目弹出；不是原地展开） */
+  .modal{display:none;position:fixed;inset:0;z-index:60}
+  .modal.on{display:block}
+  .mback{position:absolute;inset:0;background:rgba(20,24,32,.38)}
+  .mpanel{position:relative;margin:9vh auto 0;max-width:580px;background:#fff;border-radius:12px;
+    padding:14px 18px 16px;box-shadow:0 14px 44px rgba(0,0,0,.24)}
+  .mhead{display:flex;align-items:baseline;gap:8px;font-size:14px;font-weight:700;color:#23262b;
+    border-bottom:1px solid #f1f3f5;padding-bottom:8px}
+  .mclose{margin-left:auto;cursor:pointer;color:#adb5bd;font-weight:400;font-size:13px}
+  .mclose:hover{color:#495057}
+  .mbody{margin-top:10px;max-height:62vh;overflow:auto}
+  .mrow{display:flex;gap:10px;font-size:12.5px;margin-bottom:5px;line-height:1.65}
+  .mrow .mk{color:#868e96;font-size:11px;min-width:42px;flex:0 0 42px;padding-top:2px}
+  .mrow .mv{color:#23262b;flex:1}
+  /* 涨停强度算式小窗口（2026-09-14）：公式一行 + 分量表 + 名单胶囊 */
+  .scform{font-size:12.5px;color:#23262b;background:#f8f9fa;border-radius:6px;
+    padding:7px 10px;margin-bottom:8px;font-variant-numeric:tabular-nums}
+  .note2{font-size:11px;color:#868e96;line-height:1.6;margin-top:8px}
+  .scchips{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 2px}
+  .scchip{font-size:11.5px;color:#495057;background:#f1f3f5;border-radius:5px;padding:2px 7px}
+  .scchip b{color:#23262b;font-variant-numeric:tabular-nums}
+  .mcut{font-size:11px;color:#868e96;margin:10px 0 3px;padding-left:8px;position:relative}
+  .mcut::before{content:"";position:absolute;left:0;top:3px;width:3px;height:10px;background:#dee2e6;border-radius:1px}
+  .mtext{font-size:12.5px;color:#495057;line-height:1.75}
+  .mli{font-size:12.5px;padding:6px 2px;border-bottom:1px solid #f1f3f5;cursor:pointer;line-height:1.6}
+  .mli:hover{background:#f8fbff;color:#1c7ed6}
+  .evrow[data-item]{cursor:pointer}
+  .evrow[data-item]:hover{background:#f8fbff}
+  /* 四块里的条目：整行可点（展开解读）；caret 提示可点 */
+  .evhead{display:block;cursor:pointer}
+  .evhead:hover .bsub{color:#1c7ed6}
+  .evhead .caret{float:right}
+  .morewrap{margin-top:6px;border-top:1px dashed #e9ecef;padding-top:6px}
+  .morewrap summary{font-size:11px;color:#868e96;cursor:pointer;outline:none;list-style:none}
+  .morewrap summary::after{content:" ▾";color:#adb5bd}
+  .morewrap[open] summary::after{content:" ▴"}
+  .morewrap summary:hover{color:#1c7ed6}
+  /* 四块「从优展示」：2×2 卡片栅格（极限/预期/消息/全球眼光） */
+  .bgrid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px}
+  @media(max-width:900px){.bgrid2{grid-template-columns:1fr}}
+  .bgrid2 .card{margin-bottom:0}
+  .bgrid2 .card h2{font-size:14px}
+  .bgrid2 .evrow{padding:6px 2px}
+  /* 一眼层（外围宏观页最上面）：三格＝位置极端 / 当日异动 / 未来一周高影响；
+     每格左侧色条＝有没有东西（红有、灰无），正文只放点名与数字，不放解释 */
+  .glance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:10px 0 6px}
+  @media(max-width:1000px){.glance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:560px){.glance{grid-template-columns:1fr}}
+  .gcell{border-left:3px solid #dee2e6;background:#fbfcfd;border-radius:0 8px 8px 0;padding:7px 10px}
+  .glab{font-size:10px;color:#868e96;letter-spacing:.3px}
+  .gbody{font-size:12.5px;color:#23262b;margin-top:3px;line-height:1.6}
+  /* 事件行（宏观节点与重磅消息共用）：左侧色条＝影响程度（红高/橙中/灰低），
+     正文只两行——「有什么消息」「影响：有什么影响」；颜色说明收进 .legend 展开页 */
+  .evrow{display:flex;gap:9px;padding:7px 2px;border-bottom:1px solid #f1f3f5}
+  .evrow:last-child{border-bottom:0}
+  .evbar{width:3px;border-radius:2px;flex:0 0 3px;align-self:stretch;min-height:30px}
+  .evbody{flex:1;min-width:0}
+  .evline{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .evimp{font-size:12px;color:#495057;margin-top:2px;line-height:1.6}
+  .legend{margin-top:8px}
+  .legend summary{font-size:11px;color:#adb5bd;cursor:pointer;outline:none;display:inline-block}
+  .legend summary:hover{color:#868e96}
+  .card h2 .legend{margin:0 0 0 4px}
+  .card h2 .legend summary{font-size:10px}
+  .rawnote{margin-top:10px;border-top:1px dashed #e9ecef;padding-top:6px}
+  .rawnote summary{font-size:11px;color:#adb5bd;cursor:pointer;outline:none}
+  .rawnote summary:hover{color:#868e96}
+  /* 事件「解读」：每条有价值的消息都附一句——标来源性质（AI=传导机制 / 媒体 / 机构），
+     放在浅底+左竖条里，与事实行区分开（2026-09-12 用户要求："简短了解会影响什么"） */
+  .impact{font-size:12px;color:#495057;background:#f8f9fa;border-left:2px solid #dee2e6;
+    padding:5px 9px;margin:4px 0 2px 8px;border-radius:0 6px 6px 0;line-height:1.65}
+  .impact.dim{color:#adb5bd}
+  .tag.ai{background:#f3f0ff;color:#6741d9}
+  .tag.media{background:#e7f5ff;color:#1971c2}
+  .tag.inst{background:#fff4e6;color:#a15c00}
+  /* 外围宏观：4 行 × 3 框；每框＝名称/值/日涨跌 + 相对读数 + 真折线 */
+  .mgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:4px}
+  @media(max-width:820px){.mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:560px){.mgrid{grid-template-columns:1fr}}
+  .mbox{border:1px solid #f1f3f5;border-radius:10px;padding:8px 10px;background:#fbfcfd;min-width:0}
+  .mbox .bval{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+  .mchart{height:96px;margin-top:4px}
+  .mbox .m{min-width:62px}
+  /* 卡片标题：**统一格式** = 名称 + 口径（口径右对齐，退出阅读路径）；族间不看标题看色条 */
+  .card h2{display:flex;align-items:baseline;gap:10px;font-size:15px}
+  .card h2 .ph{margin-left:auto;text-align:right;color:#ced4da;font-size:11px;font-weight:400}
+  .srow{border-bottom:1px solid #f1f3f5}
+  .srow:last-child{border-bottom:0}
+  .srow:hover{background:#fcfdfe}
+  /* **一行就是一整行，永不换行**（2026-09-15 用户："这种太长的，观察会被挤到下一行，我希望统一一下都在一行里面"）：
+     原来 `flex-wrap:wrap` + ETF 那格没有上限 → 内容一长，「+观察」被挤到第二行。
+     现在：指标槽与按钮**定宽不压缩**，**只有 ETF 那格可压缩**（超出用省略号，鼠标停住看全部证据，
+     规模/跟踪度也移到悬浮提示里，不再占行内宽度）。 */
+  .sline{display:flex;align-items:baseline;gap:10px;padding:8px 2px;font-size:13px;
+         flex-wrap:nowrap;overflow:hidden}
+  .sline .m,.sline .snum,.sline .mini,.sline .caret,.sline .tag{flex:0 0 auto}
+  /* 主锚点：一行里只有一个 14/700 的元素（板块名），它就是视线落点 */
+  .sname{font-size:14px;font-weight:700;color:#23262b;cursor:pointer;min-width:104px}
+  .scode{font-size:11px;color:#adb5bd}
+  /* 指标槽：标签（10px 灰）+ 值（13px 等宽数字）→ 列对齐 */
+  .m{display:inline-flex;align-items:baseline;gap:4px;min-width:74px}
+  .m i{font-style:normal;font-size:10px;color:#adb5bd;letter-spacing:.2px}
+  .m b{font-size:13px;font-weight:600;color:#23262b;font-variant-numeric:tabular-nums}
+  .m.wide{min-width:100px}
+  .m em{font-style:normal;font-size:10px;color:#ced4da}
+  .snum{font-size:12px;color:#495057;white-space:nowrap}
+  .snum b{font-family:"Segoe UI",Arial,sans-serif;font-variant-numeric:tabular-nums}
+  /* ETF 那格：**唯一会收缩的列**（flex:1 + min-width:0 + 省略号） */
+  .setf{margin-left:auto;font-size:12px;flex:1 1 80px;min-width:0;
+        overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+  .yesetf{color:#1c7ed6}.noetf{color:#a15c00}
+  .rsn{font-size:11px;color:#adb5bd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:420px}
+  .tag{font-size:10px;padding:1px 6px;border-radius:5px;white-space:nowrap}
+  .tag.hit{background:#ffe3e3;color:#c92a2a}
+  .tag.new{background:#e7f5ff;color:#1971c2}
+  /* 方向标签：利空（红）/ 利好（绿）/ 中性（灰）——2026-09-14 用户要"直接告诉我利好还是利空" */
+  .tag.bear{background:#ffe3e3;color:#c92a2a}
+  .tag.bull{background:#e6fcf5;color:#2b8a3e}
+  .tag.flat{background:#f1f3f5;color:#868e96}
+  /* 提醒层铺开后的行（方向标签 + 事实 + 一句人话理由 + 类别） */
+  .rsum{font-size:12.5px;color:#495057;margin:2px 0 6px}
+  .rsum b{font-variant-numeric:tabular-nums}
+  .rrow{display:flex;gap:8px;align-items:baseline;font-size:12.5px;line-height:1.6;
+    padding:4px 0;border-bottom:1px solid #f8f9fa}
+  .rrow .evbar{width:3px;align-self:stretch;border-radius:2px;min-height:14px}
+  .rtxt{color:#23262b;flex:0 0 auto;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rwhy{color:#868e96;font-size:11.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rkind{color:#ced4da;font-size:11px;white-space:nowrap}
+  /* 可点的提醒行（起爆那几行）：铺开 ≠ 点了没反应 —— 鼠标手型 + hover 底色，点开是小窗口 */
+  .rrow.clickable{cursor:pointer;border-radius:5px}
+  .rrow.clickable:hover{background:#f8f9fa}
+  .rrow.clickable:hover .rkind{color:#868e96}
+  /* 「替代」= 走势跟着走但**不是同一主题**（用户 2026-09-14 定的档位），用黄底以示区别 */
+  .tag.warn{background:#fff4e6;color:#a15c00}
+  .caret{cursor:pointer;color:#adb5bd;font-size:11px}
+  .sdetail{display:none;padding:0 2px 10px}
+  .sdetail.open{display:block}
+  /* 明细表：列头右对齐、数字右对齐（NHS：data table 的列头与数值都右对齐，首列除外） */
+  .stk{border-collapse:collapse;width:100%;font-size:12px}
+  .stk th{text-align:right;color:#adb5bd;font-weight:400;font-size:11px;padding:4px 8px;
+          border-bottom:1px solid #e9ecef;white-space:nowrap}
+  .stk th:first-child,.stk td:first-child{text-align:left}
+  .stk td{padding:4px 8px;border-bottom:1px solid #f8f9fa;color:#495057;
+          font-variant-numeric:tabular-nums}
+  .stk td.rsn{text-align:left}
+  /* **归入涨停股那张表**（涨停板/新冒出展开后）：固定列宽 + 文本列截断（鼠标停住看全）
+     —— 理由/依据长短不一，自动布局会把列挤得对不齐（2026-09-15 用户："上面那些也没对齐，是乱的"） */
+  .stk--zt{table-layout:fixed}
+  .stk--zt td{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .stk--zt td.pin,.stk--zt th:last-child{text-align:right;overflow:visible}
+  .stk--zt td:nth-child(3){text-align:right}
+  /* 涨停强度算式表（2026-09-14，**必须放在 .stk 之后**才能覆盖它的 padding）：
+     **固定列宽** —— 自动布局会被"合计"那格的长文本挤歪，列头跟着换行，
+     数字就对不上列头了（用户当天就指出"表格对不齐"）。列宽在 HTML 的 colgroup 里给。 */
+  .sctab{table-layout:fixed}
+  .sctab th{padding:4px 6px;white-space:nowrap}
+  .sctab td{padding:4px 6px;text-align:right;white-space:nowrap;
+            overflow:hidden;text-overflow:ellipsis}
+  .sctab th:first-child,.sctab td:first-child{text-align:left}
+  .sctab tr.sum td{border-top:1px solid #e9ecef;border-bottom:none;font-weight:700;color:#23262b}
+  /* ETF 走势小窗口（观察区点开）：折线 + 一行区间说明 */
+  .etfchart{width:100%;height:220px;margin-top:2px}
+  /* 「同一方向的候选 ETF · 历史跟随度」表里，**当前这只**高亮一行
+     （2026-09-17 加）：表格是横向对比，得让人一眼找到自己正在看的那只。
+     底纹很浅（#f1f8ff）——只做定位，不做强调；绝不用颜色暗示"这只更好"。 */
+  .stk tr.folme{background:#f1f8ff}
+  .stk tr.folme td{font-weight:700}
+  .mini{font-size:11px;border:1px solid #d4d8de;background:#fff;border-radius:6px;padding:2px 9px;
+        cursor:pointer;color:#495057;white-space:nowrap}
+  .mini.on{background:#e7f5ff;border-color:#a5d8ff;color:#1971c2}
+  .empty{font-size:12px;color:#adb5bd;padding:10px 2px;line-height:1.8}
+  .subhd{font-size:12px;color:#868e96;margin:12px 0 4px;padding-top:8px;border-top:1px dashed #e9ecef}
+  /* 分组小标题：全站**同一个样子**（左侧短竖条 + 灰字），格式＝`维度 · 计数` */
+  .dsub{font-size:11px;color:#868e96;margin:10px 0 4px;padding-left:8px;position:relative}
+  .dsub::before{content:"";position:absolute;left:0;top:3px;width:3px;height:10px;
+    background:#dee2e6;border-radius:1px}
+  .dsub b{color:#495057;font-variant-numeric:tabular-nums}
+  .warn{color:#a15c00}
+  /* 强弱色块：只反映"当日板块涨幅"分档（图例见页面），不是把多项合成的综合分 */
+  .blk8{display:inline-block;width:8px;height:16px;border-radius:2px;vertical-align:-3px}
+  .blk8.h0{background:#dee2e6}.blk8.h1{background:#b2f2bb}.blk8.h2{background:#8ce99a}
+  .blk8.h3{background:#ffa8a8}.blk8.h4{background:#e03131}
+  /* 重点板块对比：近10日累计 + 每日涨幅节奏（小色条） */
+  .cmprow{display:flex;align-items:center;gap:14px;padding:6px 2px;border-bottom:1px solid #f1f3f5;
+          font-size:12px}
+  .cmprow:last-child{border-bottom:0}
+  .cmphd{color:#adb5bd;font-size:11px;border-bottom:1px solid #e9ecef}
+  .cmpname{width:110px;font-weight:600;color:#23262b;white-space:nowrap;overflow:hidden;
+           text-overflow:ellipsis}
+  .cmpcum{width:90px;font-family:"Segoe UI",Arial,sans-serif}
+  .cmpbars{display:inline-flex;align-items:flex-end;gap:3px;height:20px;flex:1}
+  .cbar{display:inline-block;width:7px;border-radius:2px}
+  .cbar.up{background:#e03131}.cbar.down{background:#2f9e44}
+  .cbar.flat{background:#dee2e6}
+  /* **重做后的重点板块对比**（2026-09-14）：一块板块一张卡，先给能直接读的数，
+     再给节奏条，最后给配套 ETF —— 不再是一张"表头 + 一个百分比 + 几根小柱子"。 */
+  .cmpgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:10px}
+  .cmpcard{border:1px solid #f1f3f5;border-radius:8px;padding:8px 10px;background:#fff}
+  .cmphead{display:flex;align-items:baseline;gap:8px;font-size:12.5px;flex-wrap:wrap}
+  .cmphead .cmpname{width:auto;font-size:13.5px}
+  .cmpcard .cmpbars{height:30px;margin-top:6px;gap:2px}
+  .cmpscale{font-size:10px;color:#ced4da;align-self:flex-end;margin-left:6px;white-space:nowrap;
+    line-height:1}
+  .cmpetf{margin-top:6px;font-size:12px;display:flex;align-items:baseline;gap:6px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cmphint{margin-top:6px;font-size:11.5px;color:#868e96;line-height:1.7}
+  .cmphint code{background:#f8f9fa;border-radius:4px;padding:1px 5px;font-size:11px}
+  .cmpst{color:#868e96;white-space:nowrap}
+  /* 长行允许换行（不要挤成一行） */
+  .sline.nowrap-ok{flex-wrap:wrap;row-gap:2px}
+  /* —— 观察区：板块卡（一个板块一块，指标分组，不再是一长条） —— */
+  .bcard{border:1px solid #eef0f3;border-radius:10px;padding:8px 12px;margin-bottom:8px;background:#fbfcfd}
+  .bhead{display:flex;align-items:center;gap:10px}
+  .bname{font-size:14px;font-weight:700;color:#23262b}
+  .bpct{font-family:"Segoe UI",Arial,sans-serif;font-size:14px}
+  /* 观察区卡：**两行**——上＝板块（锚点），下＝实际要交易的那只 ETF。
+     两行各有小标签（板块 / ETF），避免两个百分数混在一起看不出谁是谁（2026-09-12 重做） */
+  .bmain{flex:1;min-width:0}
+  .bline{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .bline .lab{min-width:30px}
+  .bline2{margin-top:3px}
+  .bline2 .bpct{font-size:12px}
+  .bline2 .bsub{font-size:12px;color:#495057}
+  .bline2 .bcode{font-size:11px;color:#868e96;font-family:"Segoe UI",Arial,sans-serif}
+  .bline2.none .bsub{color:#adb5bd}
+  .bcode{font-size:11px}
+  .bact{margin-left:auto;display:flex;gap:6px}
+  .bgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px 12px;margin-top:7px}
+  @media(max-width:680px){.bgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  .bcell{font-size:11px;color:#868e96;white-space:nowrap}
+  .bcell b{font-size:13px;color:#23262b;font-family:"Segoe UI",Arial,sans-serif}
+  .brow{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-top:6px;font-size:12px;
+        padding-top:5px;border-top:1px dashed #edf0f2}
+  .blab{font-size:11px;color:#adb5bd;min-width:54px}
+  /* 结构标签（板块/ETF）≠ 状态标记（.tag 有底色）——标签只留灰字，避免与状态混淆 */
+  .lab{font-size:10px;color:#adb5bd;min-width:28px;display:inline-block}
+  .bsep{width:1px;height:14px;background:#e9ecef;margin:0 4px}
+  .bhead{cursor:pointer}
+  .bhead .caret{margin-left:2px}
+  .bcard .sdetail{padding:2px 0 4px;border-top:1px dashed #edf0f2;margin-top:7px}
+  /* —— 信号源⑥：小卡横排 —— */
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 6px}
+  /* —— 板块观察页 2026-09-16 重构后的零件 —— */
+  /* ② ETF 异动：**照抄观察区那张卡**（`.bcard/.bhead/.bmain/.bline/.bact`，见「观察区」一节）——
+     上段＝最强的那只 ETF，下段＝它指的板块。
+     ⚠ 别自己另写"两个 .sline 叠起来"的版式（2026-09-16 试过：两行挤成一团，用户直接骂回来了）。 */
+  .card--sig .bcard:last-child{margin-bottom:0}
+  /* 涨停板/新冒出的「特征」格：**固定宽度**（不然"连续 8 天有涨停 · 股吧 27 帖"这类长短不一，
+     每行后面的 +观察 会落在不同横坐标上 —— 用户对"没对齐"零容忍） */
+  .m.feat{flex:0 0 260px;min-width:260px;overflow:hidden}
+  .m.feat em{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#495057}
+  /* 行内的动作（+观察 / ▸）一律推到最右（`.bact{margin-left:auto}` 见观察区一节），行行对齐 */
+  .sline .bact{display:flex;gap:8px;align-items:baseline;flex:0 0 auto;margin-left:auto}
+  /* 同类方向合并的短标注（"＋半导体"）：只提示"这个数里含谁"，不展开 */
+  .alias{font-size:11px;color:#adb5bd;white-space:nowrap}
+  /* 悬空弹窗里的涨停名单：**名称 + 几板**（代码小字标身份，涨停理由只在悬浮里） */
+  .zxlist{display:flex;flex-wrap:wrap;gap:4px 10px;margin:2px 0 4px}
+  .zxrow{display:inline-flex;align-items:baseline;gap:6px;font-size:13px;
+         padding:2px 0;min-width:150px}
+  .zxrow b{color:#23262b}
+  .zxrow i{font-style:normal;font-size:11px;color:#c92a2a;font-variant-numeric:tabular-nums}
+  .zxrow em{font-style:normal;font-size:10px;color:#ced4da}
+  .zxf{font-size:11.5px;color:#868e96;margin-top:6px}
+  .zxf b{color:#495057;font-variant-numeric:tabular-nums}
+  .chip{display:inline-flex;align-items:baseline;gap:6px;border:1px solid #e6e8ec;border-radius:8px;
+        padding:4px 9px;background:#fff;cursor:pointer;font-size:12px}
+  .chip:hover{border-color:#a5d8ff;background:#f8fbff}
+  .chip.on{border-color:#1c7ed6;background:#e7f5ff}
+  .chip b{font-size:13px;color:#23262b}
+  .chip i{font-style:normal;color:#adb5bd;font-size:11px}
+  .chip em{font-style:normal;color:#868e96;font-size:11px;background:#f1f3f5;border-radius:6px;
+           padding:0 5px}
+  /* —— 四块「从优展示」的浓缩胶囊（2026-09-13：一行放完，点谁看谁）—— */
+  .chip i.dot{width:7px;height:7px;border-radius:50%;display:inline-block;align-self:center;
+              flex:0 0 7px}
+  .chip{color:#23262b}
+  .chip.more{color:#868e96;border-style:dashed}
+  .chip.more:hover{color:#1c7ed6}
+  /* ★ 2026-09-22：日期切换器从「板块观察」那张卡的 `<h2>` 里**提到页头下自成一行**
+     （用户："把板块观察里面板块观察那一个没用内容的框删除" → 但切换器不能跟着删，
+     故选"去掉卡壳、切换器留成一行"）。`.daybar` 原来靠 `float:right` 待在 h2 右侧，
+     现在是一行里的第一项，所以在这里把 float 消掉。 */
+  .dayline{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:12px 0 2px}
+  .dayline .daybar{float:none}
+  .dayline .phline{color:#adb5bd;font-size:12px;line-height:1.7}
+  .dayline .phline b{color:#495057}
+  /* 日期切换小组件 */
+  .daybar{float:right;display:inline-flex;align-items:center;gap:4px}
+  .daybar select{font-size:12px;border:1px solid #d4d8de;border-radius:6px;padding:2px 6px;
+                 background:#fff;color:#495057;cursor:pointer}
+  .daybar button[disabled]{opacity:.4;cursor:not-allowed}

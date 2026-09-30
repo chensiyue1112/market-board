@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>消息</title>
+<link rel="stylesheet" href="assets/chainpage.css?v=09302006">
+<!-- ★★ 2026-09-27：本页＝**原先观察箱右上角那个「传导链消息」窗口**，用户定
+     「**用这个东西完全取代目前的外围宏观，外围宏观整个板块去掉，改名为消息**」
+     「**用原本应该是之前板块观察箱里面有一个模块叫消息传导链完整替代**」。
+     → 那个模块原样搬成顶层页，`box.html` 连同它的数据/导出器一并退役（那是它最后一个用途）。
+     样式在 `assets/chainpage.css`，渲染在 `assets/comp-chain.js`，数据在 `data/chain.js`。
+     ⚠ 改版式请改那两个共享文件，别在本页里另写一份。
+     刷新流程见 `docs/传导链消息.md`（用户说「刷新传导链消息」时读那份）。 -->
+<!-- ★ 2026-09-30 手机适配层（小米/HyperOS 观感 ＋ 小米浏览器已知坑）：见 assets/mobile.css 头部说明。
+     ⚠ 必须排在 chainpage.css **之后**（同特异性下后者胜）；桌面规则一律在媒体查询里，不受影响。 -->
+<link rel="stylesheet" href="assets/mobile.css?v=09302006">
+</head>
+<body>
+<div class="hdr"><nav>
+  <a href="index.html">每日页</a>
+  <a href="sector.html">概念观察</a>
+  <a href="boxos.html">超卖</a>
+  <a href="boxfol.html">跟随</a>
+  <a href="news.html" class="on">消息</a>
+  <a href="guba.html">股吧</a>
+</nav></div>
+<div class="wrap">
+  <h1>消息 · 传导链</h1>
+  <div class="sub">更新于 <b id="dday">—</b>　｜　<b id="cnt">—</b><span id="crit"></span></div>
+  <div class="sub warn" id="warn"></div>
+  <div id="view"></div>
+</div>
+<script src="data/chain.js?v=09302006"></script>
+<script src="assets/comp-chain.js?v=09302006"></script>
+<!-- ★ 2026-09-30 手机端：把原生 `<select>` 换成**可控的小米风格下拉** ——
+     ⚠ **零改动页面 JS**：原生 select 仍是状态源，脚本只读它的 options/value、选完派发 change。
+     只作用在 ≤680px（桌面由 CSS 决定不显示），见 assets/m-select.js 头部说明。 -->
+<script src="assets/m-select.js?v=09302006"></script>
+</body>
+</html>

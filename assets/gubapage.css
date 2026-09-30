@@ -1,0 +1,47 @@
+/* gubapage.css —— **「股吧」页**（`guba.html`）专用（2026-09-28 新建）
+   配色与排版跟 `chainpage.css` / `boxpage.css` 保持一致 —— 六个页面的外壳看起来是一套。 */
+:root{--ink:#20242a;--ink2:#3c4450;--muted:#6b7280;--line:#e3e8ef;--cfm:#2a78d6;
+      --warn:#d03b3b;--bg:#fafbfc;--grid:#eef1f5;--ok:#0ca30c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 "Microsoft YaHei",system-ui,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:16px 20px 60px}
+.hdr{max-width:1080px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:14px;height:48px;
+     border-bottom:1px solid var(--line);background:#fff}
+.hdr nav a{color:var(--muted);text-decoration:none;margin-right:14px;font-size:13px}
+.hdr nav a.on{color:var(--cfm);font-weight:650}
+h1{font-size:19px;margin:18px 0 4px}
+.sub{color:var(--muted);font-size:12px;margin-bottom:14px}
+.sub.warn{color:#b06000;font-size:11.5px;margin:-8px 0 14px}
+/* ── 日历（选日期） ── */
+.datebar{display:flex;align-items:center;gap:8px;margin:0 0 14px}
+.datebar button{border:1px solid var(--line);background:#fff;border-radius:7px;padding:4px 11px;
+                cursor:pointer;font-size:13px;color:var(--ink2)}
+.datebar button:hover:not(:disabled){border-color:var(--cfm);color:var(--cfm)}
+.datebar button:disabled{opacity:.4;cursor:default}
+.datebar select{border:1px solid var(--line);background:#fff;border-radius:7px;padding:4px 9px;
+                font-size:13px;color:var(--ink);min-width:150px}
+.datebar .pos{color:var(--muted);font-size:11.5px;margin-left:4px}
+/* ── 总结区 ── */
+.sum{background:#fff;border:1px solid var(--line);border-left:3px solid var(--cfm);
+     border-radius:9px;padding:13px 15px;margin-bottom:10px}
+.sum h3{font-size:13.5px;margin:0 0 7px;font-weight:650;color:var(--cfm)}
+.sum .body{font-size:13.5px;line-height:1.72;color:var(--ink)}
+.sum .body b{color:#111}
+.pts{margin-top:11px;border-top:1px solid var(--grid);padding-top:9px}
+.pts .p{display:flex;gap:9px;padding:6px 0;border-top:1px dashed var(--grid)}
+.pts .p:first-child{border-top:none}
+.pts .p .k{flex:0 0 78px;color:var(--cfm);font-weight:650;font-size:12.5px}
+.pts .p .v{flex:1;font-size:13px;color:var(--ink2)}
+/* ── 引用帖列表 ── */
+.bar{font-size:12.5px;font-weight:650;color:var(--ink2);margin:16px 0 7px}
+.post{background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 13px;margin-bottom:8px}
+.post .tt{font-size:13.5px;font-weight:600}
+.post .tt a{color:var(--ink);text-decoration:none}
+.post .tt a:hover{color:var(--cfm);text-decoration:underline}
+.post .mt{font-size:11.5px;color:var(--muted);margin-top:3px}
+.post .mt .k{margin-right:9px}
+.post .mt a.k{color:var(--cfm);text-decoration:none}
+.post .sn{font-size:12.5px;color:#4b5563;margin-top:5px;line-height:1.55}
+.post.nobody .sn{color:#a08000}
+.empty{background:#fff;border:1px solid var(--line);border-radius:9px;padding:22px;text-align:center;
+       color:var(--muted)}

@@ -1,0 +1,227 @@
+/* mobile.css — 手机适配层（2026-09-30 重做 v2）
+   ────────────────────────────────────────────────────────────────────────
+   用户：「丑的要死，你按你自己的 ui 做……折线图什么的宽度要跟随浏览器宽度啊，
+          不要超出了然后要滑动的。」
+
+   ## v1 为什么被推翻
+   v1 是照搬另一个项目（小米手机上的记账）的观感做的 —— 一堆**灰底胶囊**当导航。
+   问题是那套是"控制项"的视觉语言，拿来做**主导航**就显得又笨又吵。
+   v2 换成自己的做法：**导航就是文字 + 一条下划线**，控件才用浅底填充。
+
+   ## ★★ 真正的硬伤：横向溢出（不是审美）
+   实测（390px 视口）`index.html`：`docScrollW = 462`，比视口**宽 72px**，于是必须左右滑。
+   元凶不在图表本身，而在**网格轨道的自动最小宽度**：
+     `.emogrid{grid-template-columns:1fr}` 的 `1fr` ＝ `minmax(auto,1fr)`，
+     而 `auto` 最小值取**内容的 min-content**；`.emo` 里又有 `white-space:nowrap` 的文字
+     和一个 **ECharts 的 `<canvas>`（有固有宽度 409px）** →
+     列**没法收缩到 409 以下** → 容器 435 → ECharts 下一帧照 435 画 → **自我强化，越撑越宽**。
+   → 修法是**断掉这个循环**（见下面的 ①②③），不是把图表裁掉。
+
+   ⚠ 全部规则都在 `@media (max-width: 680px)` 里 —— **桌面一行都不动**。
+   ⚠ 本文件必须排在页面原有 CSS **之后**（同特异性下后者胜）。 */
+
+/* 自定义下拉：只在手机端顶掉原生 `<select>`（小米自带浏览器会强制渲染原生控件、CSS 控不住） */
+.msel{display:none}                         /* 桌面：不用它，原生 select 照旧 */
+
+@media (max-width: 680px) {
+  :root{
+    --m-accent:#1f6feb;          /* 强调色：比桌面的 #2a78d6 更挺一点，手机上更清楚 */
+    --m-accent-soft:#eaf1fe;
+    --m-bg:#f4f5f7;
+    --m-surface:#fff;
+    --m-line:#e9ebef;
+    --m-ink:#16202c;
+    --m-ink2:#48525f;
+    --m-muted:#8d96a3;
+    --m-fill:#f4f5f7;            /* 控件浅底 */
+    --m-fill-on:#e6e9ee;         /* 按下 */
+    --m-r:10px;
+    --m-r-lg:14px;
+    --m-tap:42px;
+    --m-shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.04);
+  }
+
+  /* ═══ ①②③ 断掉横向溢出（这三条是"能不能用"的问题，不是好不好看）═══
+     ① 网格轨道的 `1fr` → `minmax(0,1fr)`：允许轨道**收缩到 0**，不再被内容顶开
+     ② 所有要自适应宽度的容器 `min-width:0`：flex/grid 子项默认 `min-width:auto`，同样会顶开
+     ③ 画布/图片 `max-width:100%`：ECharts 的 canvas 有固有宽度，必须允许它被压回来 */
+  .emogrid,.bgrid,.bgrid2,.glance,.mgrid,.volhd,.emo .top,.dayline,.datebar,.daybar{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .emo,.card,.cn,.sum,.post,.bcard,.blk,.wrap,.top,.hdr,main,section,article{min-width:0}
+  canvas,svg,img,video{max-width:100%}
+  .spark2,#chart,#volChart,#premTrendBox,.emogrid,.mgrid,.glance,.bgrid,.bgrid2{min-width:0;max-width:100%}
+  /* 兜底：真修好了的话这条不会生效；万一还有漏网的，也不许整页左右滑 */
+  html,body{max-width:100%;overflow-x:hidden}
+
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{
+    -webkit-tap-highlight-color:transparent;
+    background:var(--m-bg);color:var(--m-ink);
+    font-size:15px;line-height:1.72;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .wrap{max-width:none;padding:14px 14px calc(48px + env(safe-area-inset-bottom))}
+
+  /* ── 页头：白底、粘顶、细分割线；**标题一行 + 导航一行** ── */
+  header{background:var(--m-surface);color:var(--m-ink);border-bottom:0}
+  .hdr{
+    display:block;max-width:none;height:auto;padding:0;background:var(--m-surface);
+    border-bottom:1px solid var(--m-line);position:sticky;top:0;z-index:30;
+    /* 毛玻璃：滚动时内容从底下穿过，比纯白更有层次 */
+    backdrop-filter:saturate(180%) blur(12px);-webkit-backdrop-filter:saturate(180%) blur(12px);
+    background:rgba(255,255,255,.92);
+  }
+  .hdr h1{
+    font-size:17px;font-weight:700;letter-spacing:.2px;margin:0;
+    padding:12px 14px 0;color:var(--m-ink);
+  }
+  /* ── 导航：**文字 + 下划线**，不用胶囊（v1 那排灰胶囊就是被推翻的东西）── */
+  nav,.hdr nav{
+    display:flex;flex-wrap:wrap;gap:0 18px;margin:0;padding:0 14px;width:auto;
+    background:none;
+  }
+  nav a,.hdr nav a{
+    display:inline-flex;align-items:center;white-space:nowrap;flex:0 0 auto;
+    margin:0;padding:12px 0;font-size:14.5px;line-height:1;color:var(--m-ink2);
+    background:none;border:0;border-bottom:2px solid transparent;border-radius:0;
+    min-height:var(--m-tap);
+  }
+  nav a.on,.hdr nav a.on{
+    color:var(--m-accent);font-weight:650;background:none;border-bottom-color:var(--m-accent);
+  }
+  nav a:active,.hdr nav a:active{color:var(--m-accent)}
+  nav a.off,.hdr nav a.off{color:#c8cdd4}
+
+  h1{font-size:20px;font-weight:700;margin:16px 0 6px;letter-spacing:.2px}
+  .sub{font-size:12.5px;color:var(--m-muted);margin-bottom:14px;line-height:1.6}
+
+  /* ── 卡片：白底、圆角、极轻阴影（不用硬边框，层次靠投影）── */
+  .card,.bcard,.cn,.star,.sum,.post,.empty{
+    background:var(--m-surface);border:0;border-radius:var(--m-r-lg);
+    box-shadow:var(--m-shadow);padding:14px;
+  }
+  .star{border-left:3px solid var(--warn,#d03b3b);border-radius:var(--m-r-lg);padding-left:13px}
+  .sum{border-left:3px solid var(--m-accent);border-radius:var(--m-r-lg);padding-left:13px}
+  .bcard .row{min-height:var(--m-tap)}
+  .cn h3,.sum h3{font-size:14px;font-weight:650}
+
+  /* ── 日期条 / 工具条 ── */
+  .datebar,.daybar,.dayline{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .datebar button,.daybar button,.bar button,.chartbar button{
+    white-space:nowrap;flex:0 0 auto;min-height:var(--m-tap);min-width:var(--m-tap);
+    padding:0 14px;border-radius:var(--m-r);border:0;background:var(--m-fill);
+    color:var(--m-ink);font-size:14px;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  .datebar button:active,.daybar button:active,.bar button:active,
+  .chartbar button:active:not([disabled]){background:var(--m-fill-on)}
+  .datebar button:disabled,.daybar button:disabled{opacity:.4}
+  .chartbar button{min-width:54px}
+  .mini{min-width:var(--m-tap);min-height:var(--m-tap);font-size:16px}
+  .datebar .pos,.daybar .ph,.daybar .dim{font-size:12px;color:var(--m-muted)}
+
+  /* ── 分段控件：浅底轨道 ＋ **白色滑块**（不是蓝块，蓝块太吵）── */
+  .seg{
+    display:inline-flex;align-items:center;gap:2px;padding:3px;border:0;border-radius:12px;
+    background:var(--m-fill);
+  }
+  .seg button,.seg-s button{
+    min-height:34px;min-width:48px;padding:0 14px;border:0;border-radius:9px;
+    background:transparent;color:var(--m-ink2);font-size:14px;line-height:1;
+    display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;
+    box-shadow:none;
+  }
+  .seg button.on{
+    background:var(--m-surface);color:var(--m-accent);font-weight:650;
+    box-shadow:0 1px 2px rgba(16,24,40,.10);
+  }
+  .seg-s button{min-width:44px;min-height:32px;padding:0 10px;font-size:13px}
+
+  /* ── 开关式小标签 ── */
+  /* ⚠ 2026-09-30：「量能」那一行是「标题 ＋ 30/60/180 ＋ 显示20日均量」三样同排，
+     ⚠ 手机上放不下时，标题会被压成两行、而分段控件**被卡片裁掉**（"180" 只剩个 "1"）——
+     因为它**不会让页面横溢**（被父容器裁掉），所以"页面级溢出"体检抓不到它。
+     → 手机上整行**竖排**，三样各占一行，谁也不挤谁。 */
+  .volhd{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+  .tgl{
+    min-height:var(--m-tap);display:inline-flex;align-items:center;padding:0 14px;margin-left:0;
+    border-radius:var(--m-r);border:0;background:var(--m-fill);color:var(--m-ink2);font-size:13px;
+  }
+  .tgl.on{background:var(--m-accent-soft);color:var(--m-accent);font-weight:600}
+  .tw,.chip{min-height:32px;display:inline-flex;align-items:center;padding:0 10px;font-size:12.5px}
+
+  /* ── 表格：窄屏**整块可横滑**（表格是二维的，硬压会读不了；这是唯一允许横滑的地方）── */
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;
+        font-size:13.5px;border-radius:var(--m-r);max-width:100%}
+  thead,tbody{display:table;width:100%}
+  th,td{padding:10px}
+
+  /* ── ★ 情绪区四张小图的行：原来 `.emo .top{white-space:nowrap;overflow:hidden}`
+     ——**nowrap ＋ hidden ＝ 直接把放不下的档位裁掉**（实测：右边的「180」只剩个 "1"）。
+     ⚠ 这类"被父容器裁掉"的毛病**不会让页面横溢**，所以"页面级溢出"体检抓不到它 ——
+       第一版就是这么漏过去的。手机上一律改成**允许换行、不裁**。 ── */
+  .emo .top{flex-wrap:wrap;white-space:normal;overflow:visible;height:auto;row-gap:4px}
+  .emo .hint{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.5}
+  .emo .seg-s{margin-left:0;align-self:flex-start}
+
+  /* ── ★★ "永不换行的行"在手机上必须放开 ──
+     `.sline{flex-wrap:nowrap;overflow:hidden}` 是 2026-09-15 为**宽屏列对齐**定的规矩
+     （"这种太长的，观察会被挤到下一行，我希望统一一下都在一行里面"）。
+     但那一行里有好几个**定宽指标槽**（`.m{min-width:74px}`…），390px 根本装不下 →
+     `.setf` 被压到 0、**右边的「+观察 / ▸」直接溢出被 `overflow:hidden` 裁掉**（实测越界 227px）。
+     ⚠ 这类"被裁掉"**不会让页面横溢**，所以"页面级溢出"体检看不见它 —— 只能靠"越界元素"数。
+     → 手机上放开换行：宽屏的列对齐意图在手机上不可能成立，**看得全**优先。 */
+  .sline{flex-wrap:wrap;overflow:visible;row-gap:2px}
+  .sline .setf{
+    margin-left:0;flex:1 1 100%;text-align:left;
+    white-space:normal;overflow:visible;text-overflow:clip;
+  }
+  .bhead{flex-wrap:wrap;row-gap:4px}
+  .bhead .bact{margin-left:auto}
+  .cmpname{width:auto;min-width:0}
+  .m.feat{flex:1 1 100%;min-width:0}
+
+  /* ── 图表：永远跟随容器宽度（配合上面的 ①②③）── */
+  #chart{height:250px !important;margin-top:8px}
+  .spark2{height:150px}
+  #volChart{width:100% !important}
+
+  /* ── 正文与要点 ── */
+  .sum .body{font-size:15px;line-height:1.78}
+  .pts{margin-top:12px}
+  .pts .p{display:block;padding:9px 0}
+  .pts .p .k{display:block;flex:none;font-size:13px;margin-bottom:2px}
+  .pts .p .v{font-size:14.5px;color:var(--m-ink2)}
+  .cn .xt,.post .sn,.star .xt{font-size:14px;line-height:1.7;color:var(--m-ink2)}
+  .post .tt,.cn .tt{font-size:15px}
+  .subrow{padding-left:0;gap:6px 16px}
+
+  /* ── 自定义下拉本体（顶掉原生 `<select>`）── */
+  select.m-hide{position:absolute !important;width:1px;height:1px;opacity:0;pointer-events:none;
+                margin:-1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .msel{
+    display:inline-flex;align-items:center;gap:8px;position:relative;flex:1 1 auto;min-width:0;
+    min-height:var(--m-tap);padding:0 12px;border-radius:var(--m-r);border:0;
+    background:var(--m-fill);color:var(--m-ink);font-size:14px;
+    font-variant-numeric:tabular-nums;user-select:none;-webkit-user-select:none;cursor:pointer;
+  }
+  .msel:active{background:var(--m-fill-on)}
+  .msel .msel-a{color:var(--m-muted);font-size:10px;transition:transform .18s;margin-left:auto}
+  .msel.open .msel-a{transform:rotate(180deg)}
+  .msel.open{box-shadow:0 0 0 2px var(--m-accent-soft)}
+  .msel[disabled]{opacity:.45}
+  .msel-panel{
+    position:absolute;z-index:60;left:0;top:calc(100% + 6px);min-width:100%;
+    max-width:min(84vw,320px);max-height:50vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    background:var(--m-surface);border:0;border-radius:var(--m-r-lg);padding:6px;
+    box-shadow:0 12px 32px rgba(16,24,40,.16),0 2px 8px rgba(16,24,40,.08);
+  }
+  .msel-opt{
+    display:flex;align-items:center;gap:8px;min-height:var(--m-tap);padding:0 12px;
+    border-radius:var(--m-r);font-size:14.5px;font-variant-numeric:tabular-nums;white-space:nowrap;
+  }
+  .msel-opt:active{background:var(--m-fill)}
+  .msel-opt.on{color:var(--m-accent);font-weight:650;background:var(--m-accent-soft)}
+  .msel-opt .msel-tick{margin-left:auto;font-weight:700}
+}
