@@ -1,0 +1,24 @@
+.sitebar,.sitebar *{box-sizing:border-box}
+/* 全站统一顶栏：桌面深色，手机白底粘顶；所有页面共用同一套 DOM。 */
+.sitebar{background:#1f2430;color:#fff;padding:8px 0}
+.sitebar .hdr{max-width:1100px;margin:0 auto;padding:0 16px;min-height:44px;height:auto;
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:transparent;border:0}
+.sitebar .hdr h1{font-size:15px;margin:0;display:flex;align-items:baseline;gap:10px;color:#fff;font-weight:650}
+.sitebar .hdr-date,.sitebar .hdr-ver{font-size:11px;font-weight:400;color:#9aa4b2;letter-spacing:.3px;white-space:nowrap}
+.sitebar nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.sitebar nav a{color:#cfd4dd;text-decoration:none;font-size:13px;padding:5px 12px;border-radius:7px}
+.sitebar nav a:hover{color:#fff}
+.sitebar nav a.on{background:#364152;color:#fff;font-weight:650}
+.sitebar nav .nsep{display:inline-block;width:1px;height:14px;background:#4a5560;margin:0 7px;align-self:center;flex:0 0 auto}
+@media (max-width:680px){
+  .sitebar{background:rgba(255,255,255,.96);border-bottom:1px solid #e6e9ee;padding:0;position:sticky;top:0;z-index:40;
+    backdrop-filter:saturate(180%) blur(12px);-webkit-backdrop-filter:saturate(180%) blur(12px)}
+  .sitebar .hdr{display:block;max-width:none;padding:0;min-height:0}
+  .sitebar .hdr h1{font-size:17px;line-height:1.2;padding:12px 14px 0;color:#1f2733;gap:8px;flex-wrap:wrap}
+  .sitebar .hdr-date,.sitebar .hdr-ver{font-size:11px;color:#8b93a1}
+  .sitebar nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0;padding:0 14px;background:none}
+  .sitebar nav a{display:flex;align-items:center;justify-content:center;white-space:nowrap;margin:0;padding:11px 2px;
+    min-height:42px;font-size:13px;line-height:1;color:#4a5560;background:none;border:0;border-bottom:2px solid transparent;border-radius:0}
+  .sitebar nav a.on{color:#1c7ed6;font-weight:650;background:none;border-bottom-color:#1c7ed6}
+  .sitebar nav .nsep{display:none}
+}

@@ -1,0 +1,495 @@
+/* theme.css — 全站视觉层 v3（2026-11-22）
+   ════════════════════════════════════════════════════════════════════════
+   只做「好看 + 手感」：**配色 / 层次 / 圆角 / 阴影 / 字体基线 / 过渡动效 / 装饰**。
+   ⚠ 不改布局尺寸（width / padding / margin / display）—— 布局归 ui.css、mobile.css 管；
+     文件末尾「信息密度」「窄屏收口」两节是 2026-11-14 与布局一起定下来的既有约定，
+     属于历史遗留，原样保留（删掉它们会把手机版排版打回旧样子）。
+   ⚠ 加载顺序：必须放在 ui.css / mobile.css / <页面>.css **之后**（各页 `<head>` 末尾），
+     靠「同特异性后加载者胜」覆盖颜色与装饰，不靠堆 !important。
+   ⚠ 全站统一用变量：换主色改 `--brand` 一处。
+
+   v3 改了什么（用户：「美化 ui，成熟风格，操作显示更丝滑」）：
+     ① 主色从亮蓝+紫的「互联网味」换成**低饱和靛蓝**一套，紫只留作同色系深色收口；
+     ② 卡片圆角 16→12、投影更浅、描边更细 —— 成熟感来自「克制」，不是加装饰；
+     ③ 涨跌色、标签、表格、按钮全部收进一套变量，六个页面的色差消失；
+     ④ 交互动效：所有可点元素统一 180ms 缓动，悬停/按下/焦点都有反馈；
+        展开与弹窗改成淡入+位移（不再"啪"地出现）；桌面顶栏吸顶；滚动条收细；
+     ⑤ 版块色条（`.card--sig` 等）恢复显示 —— v2 的 `border:...!important`
+        把它们全盖掉了，页面靠色条区分卡片族的约定失效了。
+   ⚠ 动效全部尊重 `prefers-reduced-motion`（见文件末尾）。
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root{
+  /* —— 主色：克制的靛蓝（成熟感＝低饱和 + 少量强调）—— */
+  --brand:#2f5bd7;
+  --brand-2:#24408a;          /* 同色系深一档：只用于渐变收口，不再用紫 */
+  --brand-soft:#eef3fd;
+  --brand-line:#d8e2f7;
+
+  /* —— 涨跌（A 股：红涨绿跌，降一档饱和度，长看不刺眼）—— */
+  --up:#cd4040;
+  --up-soft:#fbecec;
+  --down:#17805a;
+  --down-soft:#e9f6f0;
+
+  /* —— 中性灰阶（偏冷，文字层次拉开）—— */
+  --ink:#121821;
+  --ink-2:#3a4451;
+  --muted:#737e8c;
+  --faint:#a4adba;
+  --line:#e4e8ee;
+  --line-2:#eff2f6;
+  --bg:#f5f6f8;
+  --surface:#ffffff;
+
+  /* —— 形状与光影 —— */
+  --radius:12px;
+  --radius-sm:8px;
+  --shadow-1:0 1px 2px rgba(17,24,39,.04),0 2px 6px rgba(17,24,39,.04);
+  --shadow-2:0 8px 24px rgba(17,24,39,.09);
+  --ring:0 0 0 3px rgba(47,91,215,.18);
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --dur:.18s;
+
+  /* —— 兼容别名：boxpage / chainpage / gubapage 用 --cfm/--dis/--grid/--ink2，
+        review / position 用 --muted/--line 等；这里收口到同一套，页面色差自然消失 —— */
+  --cfm:var(--brand);
+  --dis:var(--down);
+  --ok:var(--down);
+  --warn:#c0453f;
+  --grid:var(--line-2);
+  --ink2:var(--ink-2);
+
+  /* 手机层（mobile.css）的强调色跟着主色走 */
+  --m-accent:var(--brand);
+  --m-accent-soft:var(--brand-soft);
+}
+
+/* ── 基础：字体基线、底色、选中态 ─────────────────────────────────────── */
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
+              "Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  background:linear-gradient(180deg,#f7f8fa 0,#f5f6f8 280px,var(--bg) 100%) !important;
+  color:var(--ink);
+}
+::selection{background:rgba(47,91,215,.16);color:var(--ink)}
+
+/* ── 顶栏：近黑石墨 + 底部一道发丝高光；桌面吸顶 ─────────────────────── */
+header,.sitebar{
+  background:linear-gradient(180deg,#1a2230 0%,#141a24 100%) !important;
+  box-shadow:inset 0 -1px 0 rgba(255,255,255,.06),0 4px 16px rgba(9,14,22,.14) !important;
+}
+@media (min-width:681px){
+  .sitebar{position:sticky;top:0;z-index:45}
+}
+.hdr h1{letter-spacing:.2px}
+.hdr-date,.hdr-ver{color:#95a2b5 !important;font-variant-numeric:tabular-nums}
+
+@media (min-width:681px){
+  nav a,.hdr nav a{
+    border-radius:8px !important;
+    color:#c9d1dc;
+    transition:background-color var(--dur) var(--ease),color var(--dur) var(--ease);
+  }
+  nav a:hover,.hdr nav a:hover{background:rgba(255,255,255,.075);color:#fff}
+  /* 选中态用**浅底深字**，不用蓝底白字：深色顶栏上一块浅色选中药丸，
+     既够醒目，又不会把整条导航吵成彩虹（成熟的做法是"少用饱和色块"）。
+     ⚠ 另一个原因：蓝底白字在 Windows 某些缩放下会触发文字重栅格化，
+       13px 白字被渲染成半透明（实测截图里几乎看不见）—— 浅底深字没有这个风险。 */
+  nav a.on,.hdr nav a.on{
+    background:#dfe7f8 !important;
+    color:#17213a !important;
+    font-weight:650;
+    box-shadow:0 1px 2px rgba(9,14,22,.28) !important;
+  }
+  nav .nsep{background:rgba(255,255,255,.14) !important}
+}
+
+/* ── 卡片族：统一白面 + 发丝边 + 极轻阴影；悬停只抬光影，不位移 ──────── */
+.card,.twrap,.attr,.evwrap,.hbox,.gubabox,.hero,.bond,.action{
+  border:1px solid var(--line) !important;
+  border-radius:var(--radius) !important;
+  background:var(--surface) !important;
+  box-shadow:var(--shadow-1) !important;
+}
+.bcard,.post,.cn,.empty,.holding,.mcard,.plan div,.cmpcard,.mbox,.emo,.gcell{
+  border-color:var(--line) !important;
+  border-radius:var(--radius) !important;
+  background:var(--surface) !important;
+  box-shadow:var(--shadow-1) !important;
+}
+/* `.sum` / `.star` 左侧有**语义色条**（短线红 / 长线蓝 / 置顶红），
+   所以只给形状/阴影，**不碰 border-color**，否则色条会被统一成灰线。 */
+.sum,.star{
+  border-radius:var(--radius) !important;
+  background:var(--surface) !important;
+  box-shadow:var(--shadow-1) !important;
+}
+.card,.bcard,.post,.cn,.holding,.mcard,.cmpcard,.mbox{
+  transition:box-shadow .2s var(--ease),border-color .2s var(--ease);
+}
+.card:hover{box-shadow:var(--shadow-2) !important}
+.bcard:hover,.post:hover,.cn:hover,.holding:hover,.mcard:hover,.cmpcard:hover,.mbox:hover{
+  box-shadow:var(--shadow-2) !important;
+  border-color:var(--brand-line) !important;
+}
+
+/* 色条族：**必须**在 `.card` 之后重新声明，否则会被上面那条 `border` 短属性盖掉 */
+.card--own{border-left:3px solid #5b8def !important;background:linear-gradient(180deg,#f8fbff,#fff) !important}
+.card--pool{border-left:3px solid #e0b64a !important}
+.card--sig{border-left:3px solid #8f7bd8 !important}
+.card--cmp{border-left:3px solid #3fae8f !important}
+.card--stk{border-left:3px solid #d9736f !important}
+.card--ovl{border-left:3px solid #5b8def !important}
+.card--file{border-left:3px solid #d99a4e !important}
+.card--macro{border-left:3px solid #6aa7e0 !important}
+.card--alert{border-left:3px solid #cf5a55 !important}
+
+/* 卡片标题：左侧一道实色短竖条（比渐变安静些） */
+.card > h2,.wrap > h2{
+  position:relative;
+  padding-left:11px;
+  font-size:15px !important;
+  font-weight:700 !important;
+  letter-spacing:.2px;
+  color:var(--ink) !important;
+}
+.card > h2::before,.wrap > h2::before{
+  content:"";
+  position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:3px;height:15px;border-radius:2px;
+  background:var(--brand);opacity:.75;
+}
+.card > h2 .ph{color:var(--faint) !important;font-weight:400 !important}
+
+/* ── 关键数字：更重、更黑，数字等宽（切换档位时不跳宽） ───────────────── */
+table,.vt,.m,.snum,.evt,.cmpcum,.hero .row2,.holding .pnl,.bpct,.ov .sub,
+.sline,.bline,.daybar,.datebar,.msel{font-variant-numeric:tabular-nums}
+.ov .big,.emo .n,.card .v,.hero .big,.holding .mv{
+  font-weight:800 !important;
+  letter-spacing:-.4px;
+  font-variant-numeric:tabular-nums;
+  color:var(--ink) !important;
+}
+.card .v{font-size:30px !important}
+.card .lab{color:var(--muted) !important;letter-spacing:.4px}
+
+/* ── 涨跌色：全站一套红绿 ─────────────────────────────────────────────── */
+.up,.up b,.ov .up,.pct.up,.rv.up{color:var(--up) !important}
+.down,.down b,.ov .down,.pct.down,.rv.down{color:var(--down) !important}
+.muted,.dim{color:var(--muted) !important}
+.ok{color:var(--up)}.bad{color:var(--down)}
+
+/* ── 表格：浅灰表头 + 斑马纹 + 行悬停；容器收圆角 ─────────────────────── */
+table.stk,.tablewrap table,.vt{
+  border-collapse:separate !important;
+  border-spacing:0 !important;
+}
+table.stk th,.tablewrap th,.vt th{
+  background:#f7f8fa !important;
+  color:var(--muted) !important;
+  font-weight:600 !important;
+  letter-spacing:.3px;
+  border-bottom:1px solid var(--line) !important;
+}
+table.stk tbody tr,.tablewrap tbody tr{transition:background-color .14s var(--ease)}
+table.stk tbody tr:nth-child(even),.tablewrap tbody tr:nth-child(even){background:#fbfcfd}
+table.stk tbody tr:hover,.tablewrap tbody tr:hover{background:var(--brand-soft)}
+table.stk td,.tablewrap td{border-bottom:1px solid var(--line-2) !important}
+.tablewrap{
+  border-radius:var(--radius) !important;
+  border-color:var(--line) !important;
+  box-shadow:var(--shadow-1);
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.tablewrap thead th{position:sticky;top:0;z-index:2}
+
+/* 旧页面（超卖/跟随）表格的行状态：选中行统一成主色浅底 */
+tr.on td{background:var(--brand-soft) !important}
+tr.act td{background:#fff8e9 !important}
+
+/* ── 标签 / 徽章：小圆角（胶囊只留给导航与分段控件）───────────────────── */
+.tag,.badge,.chip,.ovl-mk,.tw,.stag,.wtag{
+  border-radius:6px !important;
+  font-weight:600 !important;
+  letter-spacing:.2px;
+  transition:background-color .15s var(--ease),color .15s var(--ease),
+             border-color .15s var(--ease);
+}
+.chip{border-radius:8px !important}
+.tag.hit,.ovl-mk.hit,.badge.hot{background:var(--up-soft) !important;color:var(--up) !important}
+.tag.new,.ovl-mk.new,.badge.mid{background:var(--brand-soft) !important;color:var(--brand) !important}
+.ovl-mk.lead{background:#fdf3e5 !important;color:#a2600a !important}
+.badge.warn{background:#fdf6e3 !important;color:#8a6a12 !important}
+.badge.cool{background:var(--down-soft) !important;color:var(--down) !important}
+.badge.gray{background:#f1f3f6 !important;color:var(--muted) !important}
+.tag.bear{background:var(--up-soft) !important;color:var(--up) !important}
+.tag.bull{background:var(--down-soft) !important;color:var(--down) !important}
+.tag.flat{background:#f1f3f6 !important;color:var(--muted) !important}
+.tag.warn{background:#fdf3e5 !important;color:#a2600a !important}
+
+/* ── 控件（桌面）：细描边 + 主色浅底反馈 ─────────────────────────────── */
+@media (min-width:681px){
+  .seg{
+    border-radius:9px !important;
+    border-color:var(--line) !important;
+    background:#fff;
+    box-shadow:var(--shadow-1);
+  }
+  .seg button{
+    color:var(--ink-2) !important;
+    transition:background-color var(--dur) var(--ease),color var(--dur) var(--ease);
+  }
+  .seg button:hover{background:var(--brand-soft);color:var(--brand) !important}
+  /* 选中态同样走「浅底 + 主色字」，不用蓝底白字（理由见顶栏那条注释） */
+  .seg button.on{
+    background:var(--brand-soft) !important;
+    color:#1e3f9e !important;
+  }
+  button.mini,.mini{
+    border-radius:8px !important;
+    border-color:var(--line) !important;
+    transition:background-color var(--dur) var(--ease),color var(--dur) var(--ease),
+               border-color var(--dur) var(--ease),transform .12s var(--ease);
+  }
+  button.mini:hover{
+    background:var(--brand-soft) !important;
+    border-color:var(--brand-line) !important;
+    color:var(--brand) !important;
+  }
+  button.mini:active{transform:scale(.96)}
+  .tgl{
+    border-radius:8px !important;
+    border-color:var(--line) !important;
+    transition:background-color var(--dur) var(--ease),color var(--dur) var(--ease),
+               border-color var(--dur) var(--ease);
+  }
+  .tgl:hover{border-color:var(--brand-line) !important;background:var(--brand-soft) !important;color:var(--brand) !important}
+  .tgl.on{background:var(--brand-soft) !important;border-color:var(--brand-line) !important;color:var(--brand) !important}
+  .daybar button,.datebar button,.chartbar button,.bar button{
+    border-radius:8px !important;
+    transition:background-color var(--dur) var(--ease),color var(--dur) var(--ease),
+               border-color var(--dur) var(--ease);
+  }
+  .daybar button:hover:not([disabled]),.datebar button:hover:not([disabled]),
+  .chartbar button:hover:not([disabled]),.bar button:hover:not([disabled]){
+    background:var(--brand-soft) !important;
+    border-color:var(--brand-line) !important;
+    color:var(--brand) !important;
+  }
+  .chip:hover{border-color:var(--brand-line) !important;background:var(--brand-soft) !important}
+  .chip.on{border-color:var(--brand) !important;background:var(--brand-soft) !important;color:var(--brand)}
+}
+
+/* 按钮按下的统一反馈（不做位移，只轻缩一下，避免整行抖） */
+button:not([disabled]):active,
+.seg button:active,.chip:active,.tgl:active{transform:scale(.98)}
+
+/* ── 数据行（概念观察 / 板块观察 / 消息链接）：悬停浅底，箭头位移 ──────── */
+.srow,.cnh,.bhead,.row,.evhead,.mli,.rrow.clickable,.gref a,.crumb a{
+  transition:background-color .15s var(--ease),color .15s var(--ease);
+}
+.srow:hover{background:var(--brand-soft) !important}
+.srow:hover .sname,.bhead:hover .bname{color:var(--brand) !important}
+.cn:hover{border-color:var(--brand-line) !important}
+.sline .caret{transition:color .15s var(--ease),transform .15s var(--ease)}
+.srow:hover .caret{color:var(--brand) !important;transform:translateX(2px)}
+.cnh:hover{background:#f6f9fe !important}
+.evhead:hover .bsub{color:var(--brand) !important}
+
+/* ── 详情 / 提示条 / 告警条 ───────────────────────────────────────────── */
+.warnbox{
+  border-radius:10px !important;
+  background:linear-gradient(180deg,#fffaf0,#fff6e6) !important;
+  border-color:#f2d9a8 !important;
+  color:#8f5a00 !important;
+}
+.srcnote,.hint,.sub,.vnote,.note2,.zxf,.scale{color:var(--muted) !important}
+summary{cursor:pointer}
+.gubabox summary,.morewrap summary,.validity summary,.legend summary,.rawnote summary{
+  transition:color .15s var(--ease);
+}
+.gubabox summary:hover,.morewrap summary:hover,.validity summary:hover,
+.legend summary:hover,.rawnote summary:hover{color:var(--brand) !important}
+
+/* ── 走势页「今日定性」：深色结论条（收敛成石墨蓝，不抢整页视线）──────── */
+.verdict{
+  background:linear-gradient(135deg,#151d2b 0%,#1a2433 55%,#20304a 100%) !important;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--radius) !important;
+  box-shadow:0 10px 28px rgba(9,14,22,.18),inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+
+/* ── 股吧两段复盘：保留左右色条的语义，只调质感 ───────────────────────── */
+.sum{border-radius:var(--radius) !important}
+.sum.s{background:linear-gradient(180deg,#fffafa,#fff) !important}
+.sum.l{background:linear-gradient(180deg,#f7faff,#fff) !important}
+.sum .sgh .pl{border-radius:6px !important;letter-spacing:1.4px}
+
+/* ── 消息页传导链：手风琴卡片 ─────────────────────────────────────────── */
+.cn{border-radius:var(--radius) !important;box-shadow:var(--shadow-1);transition:box-shadow .2s var(--ease)}
+.cn .tt{font-weight:600}
+.cn .st{font-size:12px}
+
+/* ── 弹窗：面板收圆角 + 背景轻模糊（打开时淡入）────────────────────────── */
+.mback{
+  background:rgba(15,22,35,.4) !important;
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+}
+.mpanel{
+  border:1px solid var(--line);
+  border-radius:var(--radius) !important;
+  box-shadow:0 24px 60px rgba(15,22,35,.28) !important;
+}
+.mclose{transition:color .15s var(--ease)}
+.mclose:hover{color:var(--ink) !important}
+
+/* ── 展开 / 弹窗的过渡：不再「啪」地出现 ─────────────────────────────── */
+@keyframes uiFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes uiRiseIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes uiDropIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.wrap{animation:uiRiseIn .3s var(--ease) both}
+.sdetail.open,.cn.open .cnb,
+details[open] > *:not(summary){animation:uiDropIn .2s var(--ease) both}
+.modal.on .mback{animation:uiFadeIn .18s var(--ease) both}
+.modal.on .mpanel{animation:uiRiseIn .24s var(--ease) both}
+
+/* ── 滚动条（桌面）收细，颜色跟着灰阶走 ───────────────────────────────── */
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{
+  background:#c9d1dc;
+  border-radius:999px;border:2px solid transparent;background-clip:content-box;
+}
+::-webkit-scrollbar-thumb:hover{background:#aeb9c8;background-clip:content-box}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ── 焦点可见（键盘操作 / 无障碍）────────────────────────────────────── */
+a:focus-visible,button:focus-visible,select:focus-visible,[tabindex]:focus-visible{
+  outline:2px solid transparent;box-shadow:var(--ring);border-radius:8px;
+}
+select{transition:border-color .15s var(--ease),box-shadow .15s var(--ease)}
+select:focus{border-color:var(--brand) !important}
+
+/* ── 页脚：一条发丝分隔，不再孤零零一行字 ─────────────────────────────── */
+.foot{
+  border-top:1px solid var(--line);
+  margin-top:28px;padding-top:14px;
+  color:var(--faint) !important;letter-spacing:.3px;
+}
+
+/* ── 页面级区块标题（研究页 h2 不在 .card 里，单独给同样的竖条）────────── */
+.wrap > h2{margin:26px 0 10px !important}
+
+/* ── 页面主标题：底部一道渐隐细线（纯装饰，不加 DOM）──────────────────── */
+.wrap > h1{position:relative;padding-bottom:9px}
+.wrap > h1::after{
+  content:"";
+  position:absolute;left:0;bottom:0;
+  width:52px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,var(--brand),rgba(47,91,215,0));
+}
+
+/* ── 手机端：顶栏改白底毛玻璃（沿用 topbar.css 的粘顶），导航用下划线 ─── */
+@media (max-width:680px){
+  header,.sitebar{
+    background:rgba(255,255,255,.94) !important;
+    border-bottom:1px solid var(--line);
+    box-shadow:0 1px 10px rgba(17,24,39,.05) !important;
+  }
+  .sitebar .hdr h1{color:var(--ink)}
+  .sitebar .hdr-date,.sitebar .hdr-ver{color:var(--muted) !important}
+  .sitebar nav a.on{
+    color:var(--brand) !important;
+    border-bottom-color:var(--brand) !important;
+    background:none !important;
+    box-shadow:none !important;
+  }
+  nav a:active,.hdr nav a:active{opacity:.6}
+  .msel{transition:background-color .15s var(--ease),box-shadow .15s var(--ease)}
+  .msel-panel{animation:uiDropIn .18s var(--ease) both}
+  .msel-opt{transition:background-color .12s var(--ease)}
+}
+
+/* ═══ 信息密度（2026-11-14）══════════════════════════════════════════════════
+   用户原话：「研究每个票占这么多空间，每一页根本就没有信息密度」。
+   上一版为了"手机能读"把每只票做成竖排大卡（6 个字段各一行 ≈ 200px/只），
+   一屏只能看一只半 —— 那是拿密度换可读性，换过头了。这一版把密度拿回来：
+     · 手机端：**一行一只票**（名称+代码 ｜ 连板 首封 换手 封板分），原因作第二行单行截断
+     · 桌面端：表格行距压到 6px、原因列单行（悬浮看全文）
+     · 全局：卡片内距 16→14、卡片间距 14→10、列表行距 8→6
+   实测：手机一屏 ≈ 12 只票，桌面表格一屏 ≈ 18 行。 */
+@media (max-width:900px){
+  .rcard{padding:8px 10px !important;margin:0 0 6px !important;border-radius:10px !important;
+         box-shadow:0 1px 2px rgba(16,24,40,.05) !important}
+  .rcard .rh{display:flex;align-items:baseline;gap:7px;
+             border:0 !important;padding:0 !important;margin:0 !important;font-size:13px !important}
+  .rcard .rh b{font-size:13.5px !important;font-weight:650;color:var(--ink)}
+  .rcard .rh .muted{font-size:10.5px !important;color:var(--faint) !important}
+  .rcard .rm{margin-left:auto;display:flex;align-items:baseline;gap:7px;
+             font-size:11.5px;color:var(--ink-2);white-space:nowrap}
+  .rcard .rm i{font-style:normal;font-variant-numeric:tabular-nums}
+  .rcard .rm b{color:var(--up);font-size:12.5px;font-weight:750}
+  .rcard .rm b.down{color:var(--down)}
+  .rcard .rm .badge{font-size:10px;padding:1px 6px}
+  .rcard .rz{margin-top:2px;font-size:11px;line-height:1.45;color:var(--muted);
+             overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rcard .rr,.rcard .rk,.rcard .rv,.rcard .rv2{display:none !important}
+}
+
+/* 桌面表格：更紧凑 + 原因单行 */
+.tablewrap th,.tablewrap td{padding:6px 10px !important;font-size:12.5px !important}
+.tablewrap td.reason{white-space:nowrap !important;overflow:hidden !important;
+  text-overflow:ellipsis !important;max-width:380px !important;line-height:1.45 !important;
+  vertical-align:middle !important}
+.tablewrap thead th{position:sticky;top:0;z-index:2}
+
+/* 全局：卡片与列表收紧一档 */
+.card{padding:14px !important;margin-bottom:10px !important}
+.card > h2{margin-bottom:10px !important}
+.sline{padding:6px 2px !important}
+.wrap > h2{margin:18px 0 8px !important}
+.cards{gap:8px !important}
+.wrap > h1{margin:16px 0 6px !important}
+
+/* ═══ 窄屏收口（2026-11-14 第三版）════════════════════════════════════════════
+   两个必须解决的硬问题：
+   ① 卡片右端被挤出屏幕 → 用 `min(360px, 100vw - 28px)` 直接钉死宽度（此前 100vw
+      实测 =390，但 `width:auto` 的卡片仍顶到边缘，说明父级有我看不到的额外宽度）。
+   ② 手机导航只有 3 列、少了「跟随/研究」→ 直接在这里重写 4×2 网格。 */
+@media (max-width:900px){
+  nav,.hdr nav{display:grid !important;grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+               padding:0 6px !important;gap:0 !important}
+  nav .nsep{display:none !important}
+  nav a,.hdr nav a{justify-content:center !important;padding:10px 2px !important;
+                   font-size:13px !important;min-height:38px !important}
+
+  .rcards{padding:0 !important;margin:0 !important}
+  .rcard{width:auto !important;max-width:100% !important;
+         margin:0 0 6px !important;box-sizing:border-box !important;overflow:hidden}
+  .rcard .rh{overflow:hidden}
+  .rcard .rm{flex:0 0 auto}
+}
+
+/* ── 手机端微调（尺寸不动，只调质感）───────────────────────────────────── */
+@media (max-width:900px){
+  body{background:var(--bg) !important}
+  .card{border-radius:var(--radius) !important}
+  .card > h2{font-size:14.5px !important}
+  .seg{border-radius:8px !important}
+  .tag,.badge,.chip{border-radius:6px !important}
+}
+
+/* ── 减少动态效果（系统级无障碍设置）────────────────────────────────────── */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+}
