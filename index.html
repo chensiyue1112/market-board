@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>市场状态判断系统 · 每日页</title>
+<link rel="stylesheet" href="assets/ui.css?v=10092001">
+<!-- ★ 2026-09-30 手机适配层（小米/HyperOS 观感 ＋ 小米浏览器已知坑）：见 assets/mobile.css 头部说明。
+     ⚠ 必须排在 ui.css **之后**（同特异性下后者胜）；桌面规则一律在媒体查询里，不受影响。 -->
+<link rel="stylesheet" href="assets/mobile.css?v=10092001">
+</head>
+<body>
+
+<header>
+  <div class="hdr">
+    <h1>市场状态判断系统</h1>
+    <nav>
+      <a href="index.html" class="on">每日页</a>
+      <a href="sector.html">概念观察</a>
+      <a href="boxos.html">超卖</a>
+      <a href="boxfol.html">跟随</a>
+      <a href="news.html">消息</a>
+      <a href="guba.html">股吧</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- ⚠ **「今日提醒」卡 2026-09-17 已删除**（用户："主页的这个不要了，没什么参考意义。"）。
+       删掉的是：卡片本体 `#alBrief`、提醒小窗口 `#alModal`、内联 `window.ALERT_MODE="daily"`、
+       以及 `data/alerts.js` + `assets/comp-alerts.js` 两个引入。
+       ⚠ **`comp-alerts.js` 本身保留**：外围宏观页 `macro.html` 还在用它（`ALERT_MODE="macro"`
+       → `#alRisk`「对 A 股的影响」），删文件会连带把那页弄坏。
+       ⚠ 起爆/风险的**数据仍照常导出**（`export_alerts.py` 进 `alerts.js`），只是每日页不再显示 ——
+       哪天想要回来，把这几行加回即可。 -->
+
+  <div class="hint">每日页 v0.5 · 只放 <b>今日速览</b> 与 <b>情绪区</b>；板块相关（观察区 / 重点板块对比 / 候选榜）已改由「板块观察」页承载。</div>
+
+  <!-- 1 今日速览（大盘速览组件） -->
+  <div class="card">
+    <h2>今日速览 <span class="ph" id="ovDate"></span></h2>
+    <!-- 旧数据不许伪装成今天：最新交易日没取到时，这里明写"下面是哪天的数" -->
+    <div class="warnbox" id="ovStale" style="display:none"></div>
+    <div class="ov" id="ov">
+      <div class="blk"><span class="nm" id="i0-nm"></span><span class="big" id="i0-chg"></span><span class="sub" id="i0-pt"></span><span class="spark" id="i0-spark"></span></div>
+      <div class="blk"><span class="nm" id="i1-nm"></span><span class="big" id="i1-chg"></span><span class="sub" id="i1-pt"></span><span class="spark" id="i1-spark"></span></div>
+      <div class="blk"><span class="nm">两市成交</span><span class="big" id="tv"></span><span class="sub" id="tv-chg"></span><span class="vlab" id="tv-lab"></span></div>
+      <div class="blk"><span class="nm">量能比（今/昨）</span><span class="big" id="ratio"></span><span class="sub" id="ratio5"></span><span class="vlab" id="ratio-lab"></span></div>
+    </div>
+    <div class="warnbox" id="ovWarn"></div>
+    <div class="volhd">量能 · 近 N 个交易日
+      <span class="seg" id="volSeg">
+        <button id="vg-30" data-vol="30" data-n="30" class="on">30日</button><button id="vg-60" data-vol="60" data-n="60">60日</button><button id="vg-180" data-vol="180" data-n="180">180日</button>
+      </span>
+      <span class="tgl" id="volMaTgl">显示20日均量</span>
+    </div>
+    <div id="volChart"></div>
+    <!-- 当前尺度里"今天在什么位置"（2026-09-15 用户要求：标出最高/最低量能 + 今天处在什么位置） -->
+    <div class="volpos" id="volPos"></div>
+    <div class="srcnote" id="srcNote"></div>
+    <div class="chk" id="ovChk"></div>
+  </div>
+
+  <!-- 2 情绪区（情绪区组件） -->
+  <div class="card">
+    <!-- 档位 30/60/180 从卡头挪到**每个子图的右上角**、各自管理（2026-09-15 用户：
+         "30/60/180放在每个子图的右上角，单独管理。"）——四个图的历史长度不一样（微盘股 180 天、
+         强度 163 天…），想看哪个就看哪个，不用四个一起跟着换。 -->
+    <h2>情绪区</h2>
+    <div class="emogrid">
+      <div class="emo">
+        <div class="top"><span class="t">涨停强度</span><span class="n" id="v-score"></span><span class="d" id="d-score"></span>
+          <span class="seg seg-s"><button id="sg-score-30" data-seg="score" data-n="30" class="on">30</button><button id="sg-score-60" data-seg="score" data-n="60">60</button><button id="sg-score-180" data-seg="score" data-n="180">180</button></span>
+        </div>
+        <div class="hint" id="h-score"></div>
+        <div class="spark2" id="c-score"></div>
+        <div class="sub2" id="s-score"></div>
+      </div>
+      <div class="emo">
+        <div class="top"><span class="t">涨停家数</span><span class="n" id="v-zt"></span><span class="d" id="d-zt"></span>
+          <span class="seg seg-s"><button id="sg-zt-30" data-seg="zt" data-n="30" class="on">30</button><button id="sg-zt-60" data-seg="zt" data-n="60">60</button><button id="sg-zt-180" data-seg="zt" data-n="180">180</button></span>
+        </div>
+        <div class="hint" id="h-zt"></div>
+        <div class="spark2" id="c-zt"></div>
+        <div class="sub2" id="s-zt"></div>
+      </div>
+      <div class="emo">
+        <div class="top"><span class="t">连板高度</span><span class="n" id="v-height"></span><span class="d" id="d-height"></span>
+          <span class="seg seg-s"><button id="sg-height-30" data-seg="height" data-n="30" class="on">30</button><button id="sg-height-60" data-seg="height" data-n="60">60</button><button id="sg-height-180" data-seg="height" data-n="180">180</button></span>
+        </div>
+        <div class="hint" id="h-height"></div>
+        <div class="spark2" id="c-height"></div>
+        <div class="sub2" id="s-height"></div>
+      </div>
+      <div class="emo">
+        <div class="top"><span class="t">微盘股</span><span class="n" id="v-micro"></span><span class="d" id="d-micro"></span>
+          <span class="seg seg-s"><button id="sg-micro-30" data-seg="micro" data-n="30" class="on">30</button><button id="sg-micro-60" data-seg="micro" data-n="60">60</button><button id="sg-micro-180" data-seg="micro" data-n="180">180</button></span>
+        </div>
+        <div class="hint" id="h-micro"></div>
+        <div class="spark2" id="c-micro"></div>
+        <div class="sub2" id="s-micro"></div>
+      </div>
+    </div>
+    <div class="srcnote" id="emoPrem"></div>
+    <div class="srcnote" id="emoRange"></div>
+    <div class="srcnote" id="emoNote"></div>
+  </div>
+
+  <!-- 3 及以后 → 已迁出每日页（2026-09-11 起每日页只保留 速览 + 情绪）
+       原区块去向：观察区 / 重点板块对比 / 候选榜 → 「板块观察」页
+                   消息区 / 操作记录 → 后续另定页面
+       每日页不再承载这些内容，避免一屏塞太多、也避免与**概念观察**页职责重叠。 -->
+
+  <div class="foot">每日页 v0.5 · 仅 今日速览 + 情绪区（真实数据）· 板块内容见「板块观察」页</div>
+</div>
+
+<!-- 提醒小窗口 `#alModal` 随「今日提醒」卡一并删除（2026-09-17）。外围宏观页有它自己的一份。 -->
+
+<!-- 涨停强度算式小窗口：点强度曲线上的点（或卡片上的「算法 ▸」）弹出当天怎么算出来的 -->
+<div class="modal" id="emoModal">
+  <div class="mback" data-emoclose="1"></div>
+  <div class="mpanel">
+    <div class="mhead">
+      <span id="emoMTitle"></span>
+      <span class="mclose" data-emoclose="1" title="关闭（Esc）">✕</span>
+    </div>
+    <div class="mbody" id="emoMBody"></div>
+  </div>
+</div>
+
+<script src="assets/echarts.min.js?v=10092001"></script>
+<script src="data/preview.js?v=10092001"></script>
+<script src="data/emotion.js?v=10092001"></script>
+<!-- 提醒层（alerts.js / comp-alerts.js）2026-09-17 随「今日提醒」卡从本页移除；
+     外围宏观页仍在用它们，所以文件保留。 -->
+<script src="assets/comp-overview.js?v=10092001"></script>
+<script src="assets/comp-emotion.js?v=10092001"></script>
+<!-- ★ 2026-09-30 手机端：把原生 `<select>` 换成**可控的小米风格下拉** ——
+     ⚠ **零改动页面 JS**：原生 select 仍是状态源，脚本只读它的 options/value、选完派发 change。
+     只作用在 ≤680px（桌面由 CSS 决定不显示），见 assets/m-select.js 头部说明。 -->
+<script src="assets/m-select.js?v=10092001"></script>
+</body>
+</html>

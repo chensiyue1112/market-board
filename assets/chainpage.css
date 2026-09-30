@@ -1,0 +1,34 @@
+/* chainpage.css —— **「消息」页**（`news.html`）专用
+   2026-09-27 从 `box.html` 的内联 <style> 里那几行 `.cn/.it/.tt/.st/.mt/.xt` 原样搬过来，
+   配色与排版跟 `boxpage.css`（超卖/跟随）保持一致 —— 五个页面的外壳看起来是一套。 */
+:root{--ink:#20242a;--ink2:#3c4450;--muted:#6b7280;--line:#e3e8ef;--cfm:#2a78d6;
+      --warn:#d03b3b;--bg:#fafbfc;--grid:#eef1f5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 "Microsoft YaHei",system-ui,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:16px 20px 60px}
+.hdr{max-width:1080px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:14px;height:48px;
+     border-bottom:1px solid var(--line);background:#fff}
+.hdr nav a{color:var(--muted);text-decoration:none;margin-right:14px;font-size:13px}
+.hdr nav a.on{color:var(--cfm);font-weight:650}
+h1{font-size:19px;margin:18px 0 4px}
+.sub{color:var(--muted);font-size:12px;margin-bottom:14px}
+.sub.warn{color:#b06000;font-size:11.5px;margin:-8px 0 14px}
+/* ── ★ 置顶区 ── */
+.star{background:#fff;border:1px solid var(--line);border-left:3px solid var(--warn);
+      border-radius:9px;padding:11px 14px;margin-bottom:9px}
+.star .tt{font-size:14px;font-weight:650}
+.star .xt{margin-top:4px}
+/* ── 按传导链分组 ── */
+.cn{background:#fff;border:1px solid var(--line);border-radius:9px;padding:12px 14px;margin-bottom:10px}
+.cn h3{font-size:13.5px;margin:0 0 4px;font-weight:650;color:var(--cfm)}
+.cn h3 .n{font-weight:400;color:var(--muted);font-size:11.5px}
+.cn .it{padding:9px 0;border-top:1px solid var(--grid)}
+.cn .it:first-of-type{border-top:none}
+.cn .tt{font-size:13.5px;color:var(--ink)}
+.cn .st{color:var(--warn);margin-right:4px}
+.cn .mt{font-size:11.5px;color:var(--muted);margin-top:3px}
+.cn .mt .k{margin-right:8px}
+.cn .mt a.k{color:var(--cfm);text-decoration:none}
+.cn .xt{font-size:12.5px;color:#3c4450;margin-top:4px;line-height:1.55}
+.empty{background:#fff;border:1px solid var(--line);border-radius:9px;padding:22px;text-align:center;
+       color:var(--muted)}

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>跟随 · 温和回调</title>
+<link rel="stylesheet" href="assets/boxpage.css?v=10092006">
+<!-- ★ 2026-09-27：本页与「超卖」**布局完全一样**，只是信号不同 ——
+     「板块观察」四个字已去掉（用户），导航就是 **超卖 ／ 跟随**。
+     样式在 `assets/boxpage.css`，逻辑在 `assets/comp-boxsig.js`，数据在 `data/boxfol.js`，
+     **本页唯一的作用是告诉组件"读哪个全局"**。
+     ⚠ 改布局/交互请改那两个共享文件 —— 别在这两个 HTML 里各改一份（必然漂移）。 -->
+<!-- ★ 2026-09-30 手机适配层（小米/HyperOS 观感 ＋ 小米浏览器已知坑）：见 assets/mobile.css 头部说明。
+     ⚠ 必须排在 boxpage.css **之后**（同特异性下后者胜）；桌面规则一律在媒体查询里，不受影响。 -->
+<link rel="stylesheet" href="assets/mobile.css?v=10092006">
+</head>
+<body>
+<div class="hdr"><nav>
+  <a href="index.html">每日页</a>
+  <a href="sector.html">概念观察</a>
+  <a href="boxos.html">超卖</a>
+  <a href="boxfol.html" class="on">跟随</a>
+  <a href="news.html">消息</a>
+  <a href="guba.html">股吧</a>
+</nav></div>
+<div class="wrap">
+  <h1>跟随 · 温和回调 ＋ 连板抬升</h1>
+  <div class="sub">数据日 <b id="dday">—</b><span id="lsig"></span><span id="crit"></span></div>
+  <div class="sub warn" id="warn"></div>
+  <div class="daybar">
+    <button id="prev">‹ 前一天</button>
+    <select id="sel"></select>
+    <button id="next">后一天 ›</button>
+    <button id="last">最新</button>
+    <span class="dim" id="dinfo"></span>
+  </div>
+  <div class="crumb" id="crumb"></div>
+  <div id="view"></div>
+</div>
+<script src="assets/echarts.min.js?v=10092006"></script>
+<script src="data/boxfol.js?v=10092006"></script>
+<script>window.BOXCFG={src:"BOXFOL"};</script>
+<script src="assets/comp-boxsig.js?v=10092006"></script>
+<!-- ★ 2026-09-30 手机端：把原生 `<select>` 换成**可控的小米风格下拉** ——
+     ⚠ **零改动页面 JS**：原生 select 仍是状态源，脚本只读它的 options/value、选完派发 change。
+     只作用在 ≤680px（桌面由 CSS 决定不显示），见 assets/m-select.js 头部说明。 -->
+<script src="assets/m-select.js?v=10092006"></script>
+</body>
+</html>
