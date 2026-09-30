@@ -1,0 +1,77 @@
+/* gubapage.css —— **「股吧」页**（`guba.html`）专用（2026-09-28 新建）
+   配色与排版跟 `chainpage.css` / `boxpage.css` 保持一致 —— 六个页面的外壳看起来是一套。 */
+:root{--ink:#20242a;--ink2:#3c4450;--muted:#6b7280;--line:#e3e8ef;--cfm:#2a78d6;
+      --warn:#d03b3b;--bg:#fafbfc;--grid:#eef1f5;--ok:#0ca30c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 "Microsoft YaHei",system-ui,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:16px 20px 60px}
+.hdr{max-width:1080px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:14px;height:48px;
+     border-bottom:1px solid var(--line);background:#fff}
+.hdr nav a{color:var(--muted);text-decoration:none;margin-right:14px;font-size:13px}
+.hdr nav a.on{color:var(--cfm);font-weight:650}
+h1{font-size:19px;margin:18px 0 4px}
+.sub{color:var(--muted);font-size:12px;margin-bottom:14px}
+.sub.warn{color:#b06000;font-size:11.5px;margin:-8px 0 14px}
+/* ── 日历（选日期） ── */
+.datebar{display:flex;align-items:center;gap:8px;margin:0 0 14px}
+.datebar button{border:1px solid var(--line);background:#fff;border-radius:7px;padding:4px 11px;
+                cursor:pointer;font-size:13px;color:var(--ink2)}
+.datebar button:hover:not(:disabled){border-color:var(--cfm);color:var(--cfm)}
+.datebar button:disabled{opacity:.4;cursor:default}
+.datebar select{border:1px solid var(--line);background:#fff;border-radius:7px;padding:4px 9px;
+                font-size:13px;color:var(--ink);min-width:150px}
+.datebar .pos{color:var(--muted);font-size:11.5px;margin-left:4px}
+/* ── 总结区 ── */
+.sum{background:#fff;border:1px solid var(--line);border-left:3px solid var(--cfm);
+     border-radius:9px;padding:13px 15px;margin-bottom:10px}
+.sum h3{font-size:13.5px;margin:0 0 7px;font-weight:650;color:var(--cfm)}
+.sum .body{font-size:13.5px;line-height:1.72;color:var(--ink)}
+.sum .body b{color:#111}
+.pts{margin-top:11px;border-top:1px solid var(--grid);padding-top:9px}
+.pts .p{display:flex;gap:9px;padding:6px 0;border-top:1px dashed var(--grid)}
+.pts .p:first-child{border-top:none}
+.pts .p .k{flex:0 0 78px;color:var(--cfm);font-weight:650;font-size:12.5px}
+.pts .p .v{flex:1;font-size:13px;color:var(--ink2)}
+/* ── 长短线两段（2026-10-21）──
+   ★ 用户：「**你的股吧页面也要分成长短线来讲，这是两个完全不一样的行情**」；
+     随后又改口：「**算了，你的四个字概括的完全很有限，用一句话吧**」——
+     所以每段开头那格是**一句话**（不是四个大字）。两段**字号/字重等同**，
+     只用颜色分：短线红系、长线蓝系。
+   ★ 用户：「**一堆灰色小字都删掉，特别碍事**」→ 这里除了长线那行**读数**（它本来就是数据，
+     不是解说），**不再有任何说明性小字**。
+   ⚠ 所有新样式都带 `.sum` / `.lview` 容器前缀 —— 不许写裸选择器（`mobile.css` 里
+     `.tag{font-size:20px}` 那次污染了全部页面，2026-10-21 刚踩过）。 */
+.sum.s{border-left-color:#c0392b}
+.sum.l{border-left-color:#1c63c4}
+.sum .sgh{display:flex;align-items:flex-start;gap:9px;margin:0 0 8px}
+/* 「短线 / 长线」小牌子：**彩色**（不是灰字），一眼分清是哪一段 */
+.sum .sgh .pl{font-style:normal;font-size:11px;font-weight:650;letter-spacing:2px;
+              padding:2px 8px;border-radius:5px;line-height:1.5;flex:0 0 auto;margin-top:2px}
+.sum .sgh .pl.s{color:#c0392b;background:#fdecea}
+.sum .sgh .pl.l{color:#1c63c4;background:#e9f0fb}
+/* ★★ 那一格是**一句话**（2026-10-21 晚改：用户「四个字概括的完全很有限，用一句话吧」）——
+   按**正文**排：13.5px、行高 1.7、`font-weight:500`（**不是 700**）、允许断行。
+   ⚠ 名字叫 `.tline` 而不是 `.t4`/`.tag`：`.tag` 在 `mobile.css` 里还有
+     `.tl .tag{font-size:20px}` 那条作用域规则，复用一定被撑成大字（当天刚踩过）。
+   ⚠ 两段**字号/字重完全相同**，**只有颜色不同**：短线红系、长线蓝系。 */
+.sum .sgh .tline{font-size:13.5px;font-weight:500;line-height:1.7;letter-spacing:0;
+                 flex:1 1 auto;min-width:0;white-space:normal;word-break:break-word}
+.sum .sgh .tline.s{color:#ad3327}
+.sum .sgh .tline.l{color:#1c63c4}
+/* ★ 长线事实读数：**真实数据**的一行（上证/均线/分位/回撤/成交/微盘），
+   12px 灰、数字等宽、紧凑 —— 它是「读数」，不是散文，所以贴着长线那一段的上沿。 */
+.lview{font-size:12px;color:#6b7280;font-variant-numeric:tabular-nums;
+       line-height:1.6;margin:-1px 0 9px 4px;letter-spacing:.2px}
+/* ── 引用帖列表 ── */
+.bar{font-size:12.5px;font-weight:650;color:var(--ink2);margin:16px 0 7px}
+.post{background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 13px;margin-bottom:8px}
+.post .tt{font-size:13.5px;font-weight:600}
+.post .tt a{color:var(--ink);text-decoration:none}
+.post .tt a:hover{color:var(--cfm);text-decoration:underline}
+.post .mt{font-size:11.5px;color:var(--muted);margin-top:3px}
+.post .mt .k{margin-right:9px}
+.post .mt a.k{color:var(--cfm);text-decoration:none}
+.post .sn{font-size:12.5px;color:#4b5563;margin-top:5px;line-height:1.55}
+.post.nobody .sn{color:#a08000}
+.empty{background:#fff;border:1px solid var(--line);border-radius:9px;padding:22px;text-align:center;
+       color:var(--muted)}

@@ -1,0 +1,88 @@
+/* tlpage.css —— 「时间轴」页（`timeline.html`）的样式
+ *
+ * ★★★ 2026-10-13 新建（用户：「**再加一个页面，做一种类似时间轴的东西，开盘日用股吧得到的
+ *   消息总结为四个字，这四个字要高度凝结总结当天的市场。……ui 形式你自己定，
+ *   我也没有什么好想法，但是要方便观看和翻阅。**」）
+ *
+ * 设计原则：**一行一天，四个字是主角**。
+ *   · 左边一条竖线 ＋ 圆点 —— 时间轴的骨架，别加卡片、别加边框（加了就不像时间轴了）
+ *   · 四个字 **22px ＋ 字距**，一屏能扫过十几天的"情绪史"
+ *   · 数字（涨停／最高连板／连板家数）**自动算**，放在四字右边一行，不跟正文抢
+ *   · 注解**一行封顶**（超了省略号）—— 时间轴不负责讲道理，只负责让你**想起那天**
+ *   · 按**月**分组，翻长了也有落点
+ */
+:root{
+  --line:#e6e9ee; --grid:#f0f2f5;
+  --ink:#1f2733; --muted:#8b93a1; --cfm:#1c7ed6; --warn:#d03b3b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:var(--ink);
+     font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.hdr{background:#1f2733;padding:0 18px}
+.hdr nav{max-width:900px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap}
+.hdr a{color:#c8ced8;text-decoration:none;font-size:13px;padding:11px 10px;display:inline-block}
+.hdr a:hover{color:#fff}
+.hdr a.on{color:#fff;font-weight:650;box-shadow:inset 0 -2px 0 var(--cfm)}
+.wrap{max-width:900px;margin:0 auto;padding:20px 18px 60px}
+h1{font-size:20px;margin:0 0 6px;letter-spacing:.3px}
+.sub{font-size:12.5px;color:var(--muted);margin-bottom:4px}
+.sub.warn{color:var(--warn)}
+.tl{margin-top:18px}
+
+/* ── 月份分隔 ── */
+.mo{margin:26px 0 10px;font-size:13px;font-weight:650;color:#4a5560;letter-spacing:.5px}
+.mo:first-child{margin-top:6px}
+.mo i{font-style:normal;color:var(--muted);font-weight:400;margin-left:8px;font-size:12px}
+
+/* ── 一行一天：`padding-left` 留出竖线，圆点用 `::before` 定位在竖线上 ── */
+.day{position:relative;padding:10px 0 10px 30px;border-left:1px solid var(--line)}
+.day:last-child{border-left-color:transparent}
+.day::before{content:"";position:absolute;left:-4.5px;top:19px;width:8px;height:8px;
+             border-radius:50%;background:#fff;border:2px solid var(--cfm)}
+.day.old::before{border-color:#c8ced8}          /* 更早的日子：点淡一点，最新的最亮 */
+
+/* 日期 ＋ 四个字 ＋ 数字 三块并排 */
+.drow{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.ddate{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;flex:0 0 auto;
+       min-width:76px}
+/* ★ 主角：四个字。字距拉开，才有一枚"印章"的感觉
+   ⚠ 2026-10-21 晚起：时间轴上**已经不用这一套了** —— 四字改成了**一句话**（见下面的
+     `.tline`）。这条规则**保留不动**（`mobile.css` 里还挂着 `.tl .tag{font-size:20px}`，
+    `.tag` 在别的页面也还有用），新元素**一律走 `.tline`**，别复用 `.tag`。 */
+.tag{font-size:22px;font-weight:700;letter-spacing:6px;line-height:1.25;flex:0 0 auto;
+     margin-right:-6px}
+/* ★★★ 2026-10-21 晚：**长短线各一句话**（用户：「**算了，你的四个字概括的完全很有限，
+   用一句话吧**」）。
+   ⚠ 它们是**句子**，按**正文字号**排（13.5px、正常行高 1.65、`font-weight:400`）——
+     **绝不沿用上面 `.tag` 那套 20~22px／700 的大字**（那样一句话会像标语一样糊满屏）。
+   ⚠ 两行结构完全一致（短/长小牌子 ＋ 同字号），**只有颜色分**：短线红系、长线蓝系。
+   ⚠ 一律带 `.tl` 容器前缀 —— 裸选择器会污染全站（2026-10-21 刚踩过 `.tag` 那次）。 */
+.tl .tones{margin-top:3px;display:flex;flex-direction:column;gap:2px}
+.tl .tln{display:flex;align-items:flex-start;gap:7px}
+.tl .tln .tk{font-style:normal;font-size:10.5px;font-weight:650;line-height:1.4;
+             padding:1px 5px;border-radius:4px;flex:0 0 auto;margin-top:3px;letter-spacing:0}
+.tl .tln .tk.s{color:#c0392b;background:#fdecea}
+.tl .tln .tk.l{color:#1c63c4;background:#e9f0fb}
+.tl .tline{font-size:13.5px;font-weight:400;line-height:1.65;letter-spacing:0;
+           flex:1 1 auto;min-width:0;white-space:normal;word-break:break-word}
+.tl .tline.s{color:#ad3327}
+.tl .tline.l{color:#1c63c4}
+.dstats{font-size:12px;color:var(--muted);flex:1 1 auto;font-variant-numeric:tabular-nums}
+.dstats b{color:#4a5560;font-weight:650}
+/* ★★★ 2026-10-17：四字右边那根 **12px 涨跌条**（红涨绿跌，宽度在 JS 里按 |涨跌| 算）。
+   作用：竖着扫下来就是一条"情绪心电图"，不用读数字。 */
+.db{display:inline-block;height:12px;border-radius:2px;flex:0 0 auto;align-self:center;
+    opacity:.85;margin-left:-6px}
+/* **之后 3 个交易日**（沪指累计）—— 这是"验证"，不是"预测"；还没走完的写「待验证」 */
+.dfwd{font-size:12px;color:var(--muted);flex:0 0 auto;font-variant-numeric:tabular-nums;
+      white-space:nowrap}
+.dfwd b{font-weight:650}
+.dfwd b.up{color:#c0392b}
+.dfwd b.dn{color:#1a9e5f}
+.dfwd.pend{color:#b0b7c0}
+.dnote{font-size:12.5px;color:#5b6472;margin-top:3px;
+       overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dlink{font-size:12px;color:var(--cfm);text-decoration:none;margin-left:10px;white-space:nowrap}
+.dlink:hover{text-decoration:underline}
+.empty{background:#fff;border:1px solid var(--line);border-radius:9px;padding:22px;text-align:center;
+       color:var(--muted)}

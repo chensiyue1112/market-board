@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>时间轴</title>
+<link rel="stylesheet" href="assets/tlpage.css?v=ed5676e5">
+<!-- ★★★ 2026-10-13 新建（用户：「**再加一个页面，做一种类似时间轴的东西，开盘日用股吧得到的
+     消息总结为四个字，这四个字要高度凝结总结当天的市场。之前的日子没有无所谓，从今天开始。
+     ui 形式你自己定……但是要方便观看和翻阅。**」）
+     数据：`data/timeline.js`（`window.TL`，由 `pipeline/tools/export_timeline.py` 生成）
+     样式：`assets/tlpage.css`　渲染：`assets/comptl.js`
+     ⚠ **那两句话和股吧总结是同一件事**：都存在 `tgb_summary` 上（`tag_s` / `tag_l` 两列），
+       同一次 `guba_note.py --add` 写入 —— **不另存一份**，否则迟早漂移。
+     ⚠ 2026-10-21 晚：那两格从「四个字」改成了「**一句话**」（用户：「算了，你的四个字概括的
+       完全很有限，用一句话吧」）→ 列名仍是 `tag_s`/`tag_l`，页面用 `.tline` 按正文字号排。
+     ⚠ 分工（《需求文档》§4）：**数字是脚本算的**（涨停/最高连板/连板家数，来自 `stock_zt`）、
+       **短线/长线那两句话是 AI 读当天复盘写的**。 -->
+<!-- ★ 2026-09-30 手机适配层：见 assets/mobile.css 头部说明。
+     ⚠ 必须排在 tlpage.css **之后**（同特异性下后者胜）。 -->
+<link rel="stylesheet" href="assets/mobile.css?v=1ede30f9">
+</head>
+<body>
+<div class="hdr"><nav>
+  <a href="index.html">每日页</a>
+  <a href="sector.html">概念观察</a>
+  <a href="boxos.html">超卖</a>
+  <a href="boxfol.html">跟随</a>
+  <span class="nsep" aria-hidden="true"></span>
+  <a href="news.html">消息</a>
+  <a href="guba.html">股吧</a>
+  <a href="timeline.html" class="on">时间轴</a>
+</nav></div>
+<div class="wrap">
+  <h1>时间轴 · 每天两句话</h1>
+  <div class="sub">最新 <b id="dday">—</b>　｜　共 <b id="cnt">—</b>　｜　<span id="rule"></span></div>
+  <div class="sub warn" id="warn" style="display:none"></div>
+  <div class="tl" id="view"></div>
+</div>
+<script src="data/timeline.js?v=4680a064"></script>
+<script src="assets/comptl.js?v=70c1eb22"></script>
+</body>
+</html>
