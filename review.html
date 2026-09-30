@@ -1,0 +1,59 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>盘后研究</title>
+<link rel="stylesheet" href="assets/review.css?v=978e5338">
+<link rel="stylesheet" href="assets/mobile.css?v=3631dd02">
+<link rel="stylesheet" href="assets/topbar.css?v=7ba4346d">
+<link rel="stylesheet" href="assets/theme.css?v=c136dbfc">
+
+</head>
+<body>
+<header class="sitebar">
+  <div class="hdr">
+    <h1>市场状态判断系统<span id="hdrDate" class="hdr-date"></span><span id="hdrVer" class="hdr-ver"></span></h1>
+    <nav>
+      <a href="index.html">每日页</a>
+      <a href="sector.html">概念观察</a>
+      <a href="boxos.html">超卖</a>
+      <a href="boxfol.html">跟随</a>
+      <span class="nsep" aria-hidden="true"></span>
+      <a href="news.html">消息</a>
+      <a href="trend.html">走势</a>
+      <a href="position.html">持仓</a>
+      <a href="review.html" class="on">研究</a>
+    </nav>
+  </div>
+</header>
+<div class="wrap">
+  <h1>盘后研究</h1>
+  <div class="sub" id="meta">—</div>
+
+  <div class="cards" id="cards"></div>
+
+  <h2>涨停质量</h2>
+  <div class="hint">排序：连板高度 ↓ → 封板分 ↓ → 首封时间 ↑&nbsp;&nbsp;｜&nbsp;&nbsp;封板分 = 50 + 早封(≤10:00 +20) − 炸板(每次−5，最多−25) + 量比(±10~15) + 连板 +5 + 成交额≥5亿 +5&nbsp;&nbsp;｜&nbsp;&nbsp;悬浮分数看这只票的构成</div>
+  <div class="tablewrap"><table id="qualityTable">
+    <thead><tr><th>股票</th><th>连板</th><th>首封</th><th>炸板</th><th>换手</th><th>5日量比</th><th>封板分</th><th class="lead">原因</th></tr></thead>
+    <tbody id="qualityRows"></tbody>
+  </table></div>
+  <div class="rcards" id="qualityCards" style="padding:0 14px"></div>
+
+  <h2>板块状态</h2>
+  <div class="hint">状态由涨停家数、最高板、较昨日变化推出来；不是买卖建议。</div>
+  <div class="tablewrap"><table id="stateTable">
+    <thead><tr><th>板块</th><th>涨停</th><th>最高</th><th class="lead">状态</th><th class="lead">龙头</th><th>较昨</th></tr></thead>
+    <tbody id="stateRows"></tbody>
+  </table></div>
+  <div class="rcards" id="stateCards" style="padding:0 14px"></div>
+
+  <p class="note" id="note"></p>
+</div>
+<script src="data/review.js?v=6d2803fa"></script>
+<script src="assets/compreview.js?v=89b64c72"></script>
+<script src="data/version.js?v=07a5ef94"></script>
+<script src="assets/navbar.js?v=3c4b60ed"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>持仓</title>
+<link rel="stylesheet" href="assets/position.css?v=c97d92d8">
+<link rel="stylesheet" href="assets/mobile.css?v=3631dd02">
+<link rel="stylesheet" href="assets/topbar.css?v=7ba4346d">
+<link rel="stylesheet" href="assets/theme.css?v=c136dbfc">
+</head>
+<body>
+<header class="sitebar">
+  <div class="hdr">
+    <h1>市场状态判断系统<span id="hdrDate" class="hdr-date"></span><span id="hdrVer" class="hdr-ver"></span></h1>
+    <nav>
+      <a href="index.html">每日页</a>
+      <a href="sector.html">概念观察</a>
+      <a href="boxos.html">超卖</a>
+      <a href="boxfol.html">跟随</a>
+      <span class="nsep" aria-hidden="true"></span>
+      <a href="news.html">消息</a>
+      <a href="trend.html">走势</a>
+      <a href="position.html" class="on">持仓</a>
+      <a href="review.html">研究</a>
+    </nav>
+  </div>
+</header>
+<div class="wrap">
+  <h1>持仓</h1>
+  <div class="sub" id="meta">—</div>
+
+  <section class="hero">
+    <div class="label">总资产</div>
+    <div class="big" id="assets">—</div>
+    <div class="row2"><span id="pnl">—</span><span id="today">—</span></div>
+    <div class="hint" id="hint">—</div>
+  </section>
+
+  <h2>我的持仓</h2>
+  <div class="holdings" id="holdings"></div>
+  <div class="bond" id="bond"></div>
+
+  <div class="action" id="action"></div>
+
+  <p class="note" id="note"></p>
+</div>
+<script src="data/position.js?v=586ae7d6"></script>
+<script src="assets/comppos.js?v=665d5310"></script>
+<script src="data/version.js?v=07a5ef94"></script>
+<script src="assets/navbar.js?v=3c4b60ed"></script>
+</body>
+</html>

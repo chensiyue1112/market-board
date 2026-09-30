@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>市场状态判断系统 · 每日页</title>
+<link rel="stylesheet" href="assets/ui.css?v=85030b24">
+<link rel="stylesheet" href="assets/mobile.css?v=3631dd02">
+<link rel="stylesheet" href="assets/topbar.css?v=7ba4346d">
+<link rel="stylesheet" href="assets/trend.css?v=de389128">
+<link rel="stylesheet" href="assets/theme.css?v=c136dbfc">
+</head>
+<body class="trend">
+
+<header class="sitebar">
+  <div class="hdr">
+    <h1>市场状态判断系统<span id="hdrDate" class="hdr-date"></span><span id="hdrVer" class="hdr-ver"></span></h1>
+    <nav>
+      <a href="index.html" class="on">每日页</a>
+      <a href="sector.html">概念观察</a>
+      <a href="boxos.html">超卖</a>
+      <a href="boxfol.html">跟随</a>
+      <span class="nsep" aria-hidden="true"></span>
+      <a href="news.html">消息</a>
+      <a href="trend.html">走势</a>
+      <a href="position.html">持仓</a>
+      <a href="review.html">研究</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <h1>趋势研判 <span class="tdate" id="tDate"></span></h1>
+
+  <!-- ① 今日定性：一句话说清什么涨、什么跌 -->
+  <div class="verdict" id="tVerdict">—</div>
+
+  <!-- ② 指数：只今日 -->
+  <h2>指数</h2>
+  <div class="twrap">
+    <table class="tt" id="tIdx">
+      <thead><tr><th class="l">指数</th><th>今日</th><th>成交额占比</th></tr></thead>
+      <tbody id="tIdxRows"></tbody>
+    </table>
+  </div>
+
+  <!-- ③ 板块归因：涨的是哪类、跌的是哪类（解释上面那条分化） -->
+  <h2>板块归因</h2>
+  <div class="attr">
+    <div class="arow"><span class="ak up">涨</span><div class="ab" id="tUpB"></div></div>
+    <div class="arow"><span class="ak down">跌</span><div class="ab" id="tDnB"></div></div>
+  </div>
+
+  <!-- ④ 短线主线：经过研判，最多 3 个 -->
+  <h2>短线主线</h2>
+  <div class="judge" id="tJudge"></div>
+  <div class="mains" id="tMains"></div>
+
+  <!-- ⑤ 隐性聚集：同花顺统计不到的名字炒作，够格才出 -->
+  <div id="tHidden"></div>
+
+  <!-- ⑥ 影响因素：宏观级、当天、最多 2 条 -->
+  <h2>影响因素</h2>
+  <div class="evwrap" id="tEvent"></div>
+
+  <details class="gubabox">
+    <summary>股评原帖（依据，默认收起 · 另见 <a href="guba.html">股吧原文页</a>）</summary>
+    <div id="tGuba"></div>
+  </details>
+
+  <div class="foot">趋势 v2 · 指数与板块＝index_daily / board_tdx_daily；短线＝stock_zt 聚合研判｜ 描述性判断，不预测</div>
+</div>
+
+<script src="data/trend.js?v=dac1e3e4"></script>
+<script src="assets/comp-trend.js?v=96699594"></script>
+<script src="data/version.js?v=07a5ef94"></script>
+<script src="assets/navbar.js?v=3c4b60ed"></script>
+</body>
+</html>

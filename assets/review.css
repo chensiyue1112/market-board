@@ -1,0 +1,111 @@
+﻿*{box-sizing:border-box}
+body{margin:0;background:#f5f7fa;color:#1f2733;font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.hdr{background:#1f2733;padding:0 18px}
+.hdr nav{max-width:1240px;margin:0 auto;display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.hdr a{color:#c8ced8;text-decoration:none;font-size:13px;padding:11px 9px;display:inline-block}
+.hdr a:hover{color:#fff}.hdr a.on{color:#fff;font-weight:650;box-shadow:inset 0 -2px 0 #1c7ed6}
+.hdr .nsep{width:1px;height:16px;background:#3a4350;margin:0 4px}
+.wrap{max-width:1240px;margin:0 auto;padding:24px 20px 60px}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:15px;margin:28px 0 8px;color:#4a5560}
+.sub{font-size:12.5px;color:#8b93a1;margin-bottom:18px}
+.hint{font-size:12px;color:#8b93a1;margin-bottom:9px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.card{background:#fff;border:1px solid #e6e9ee;border-radius:10px;padding:14px 16px}
+.card .lab{font-size:12px;color:#8b93a1}.card .v{font-size:25px;font-weight:700;font-variant-numeric:tabular-nums}
+.tablewrap{overflow:auto;background:#fff;border:1px solid #e6e9ee;border-radius:10px}
+table{width:100%;border-collapse:collapse;min-width:0}
+th,td{padding:9px 11px;border-bottom:1px solid #eef1f4;font-size:12.5px;text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}th{background:#fafbfc;color:#8b93a1;font-weight:600}
+tr:last-child td{border-bottom:0}
+/* ★ 2026-11-14：原因列原来 `nowrap + ellipsis` 单行截断，1440 屏上也只能看到
+   「1, 据2026年8月26日公告，公司拟投资约10亿元…」—— 信息被截掉一半且截断位置不齐。
+   改成**自然换行**（`white-space:normal`）：行会变高，但信息完整。
+   ⚠ 别用 `display:-webkit-box` 做 clamp —— 那些属性作用在 `<td>` 上会**破坏表格单元格布局**，
+     实测文字溢出到行外、每行底部出现半截字（这是第一次改的时候踩的，已回退）。 */
+th.lead{text-align:left}td.reason{max-width:430px;text-align:left;white-space:normal;word-break:break-word;
+  color:#6b7480;line-height:1.45;vertical-align:top}
+.up{color:#c0392b}.down{color:#1a9e5f}.muted{color:#8b93a1}
+.badge{display:inline-block;padding:1px 7px;border-radius:5px;font-size:11.5px}
+.badge.hot{background:#fdecea;color:#c0392b}.badge.mid{background:#fff4e6;color:#d97706}
+.badge.warn{background:#fff9db;color:#a16207}.badge.cool{background:#e9f7ef;color:#1a9e5f}
+.badge.gray{background:#f1f3f5;color:#5b6472}
+.note{font-size:12px;color:#8b93a1;margin-top:14px}
+@media(max-width:720px){/* ★ 2026-11-14：`1fr 1fr` 的隐含最小值是 `auto`（内容最小宽度）—— 两列时合计会把容器撑到视口外，右列被裁。必须写 `minmax(0,1fr)`。 */.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.card{min-width:0}.wrap{padding:18px 14px 50px}}
+
+/* ═══ 手机卡片列表（研究页专用，2026-11-14）═══════════════════════════════════
+   为什么另起一套 DOM：390px 宽里二维表格**怎么排都对不齐**——
+   横滑 = 一屏只看到 4 列；把 table/tr/td 全改 display 又控不住宽度（实测卡片被撑到视口外）。
+   所以同一份数据渲染两次：桌面 `<table>`（列对齐、可整块横滑），窄屏 `.rcard`（竖排、一屏读完）。
+   `compreview.js` 同时写 `#qualityRows/#stateRows` 与 `#qualityCards/#stateCards`；
+   这里按宽度二选一显示，**不需要 JS 判断屏幕**。 */
+.rcards{display:none}
+.rcard{background:#fff;border:1px solid #e6e9ee;border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.rcard .rh{font-size:15px;font-weight:650;color:#16202c;border-bottom:1px solid #eef1f4;
+           padding-bottom:7px;margin-bottom:6px}
+.rcard .rh .muted{color:#8b93a1;font-weight:400;font-size:12.5px;margin-left:2px}
+.rcard .rr{display:block;overflow:hidden;padding:3px 0;font-size:13.5px}
+.rcard .rk{float:left;color:#8b93a1}
+.rcard .rv{float:right;text-align:right;font-variant-numeric:tabular-nums;color:#23262b}
+.rcard .rz{margin-top:6px;padding-top:7px;border-top:1px dashed #eef1f4}
+.rcard .rz .rk{display:block;margin-bottom:3px;font-size:12.5px}
+.rcard .rv2{font-size:13.5px;line-height:1.6;color:#48525f;overflow-wrap:anywhere}
+.rcard .up{color:#c0392b}.rcard .down{color:#1a9e5f}.rcard .muted{color:#8b93a1}
+
+@media (max-width:680px){
+  .rcards{display:block}
+  .tablewrap{display:none}
+  /* 卡片宽度直接按视口算，不依赖父级（父级宽度在这页上不可控） */
+  .rcards .rcard{width:calc(100vw - 32px);max-width:calc(100vw - 32px);margin:0 0 10px;
+                 box-sizing:border-box}
+}
+
+/* ═══ 2026-11-14 窄屏兜底：把页面宽度**钉死在视口**上 ═══════════════════════════
+   现象：手机 390px 下整页内容被右边缘切掉（卡片右边界看不见、值右对齐跑到屏幕外）。
+   根因方向：某个**不换行的长文本**把 body 的布局宽度撑到 > 视口，`overflow-x:hidden`
+   只裁显示、不改布局宽 → 所有 `width:auto` 的容器（`.wrap` / 卡片）跟着变宽。
+   这里做三件事：① 长文本一律允许换行；② `.wrap`/卡片钉死 100vw；③ 溢出裁切。 */
+@media (max-width:680px){
+  .wrap,.rcards{width:100vw;max-width:100vw;box-sizing:border-box}
+    .hint,.sub,.note,.rh,.rr,.rz,.rv2{white-space:normal;overflow-wrap:anywhere;word-break:break-word}
+}
+
+/* ═══ 2026-11-14 最终兜底（第二版）═════════════════════════════════════════════
+   前一版用 `100vw` 钉宽度没用（实测卡片仍顶到视口右边缘、右侧 padding 消失）。
+   这一版改思路：**每一层都 `max-width:100%` + `overflow:hidden`**，
+   让"超宽内容"在容器内被裁，而不是把整页撑开。
+   `@media` 命中与否已经用红框验证过：命中。 */
+@media (max-width:680px){
+  body{overflow-x:hidden}
+  .wrap{width:auto;max-width:100%;box-sizing:border-box;padding:14px;overflow:hidden}
+  .rcards{width:auto;max-width:100%;box-sizing:border-box;overflow:hidden}
+    .rcard .rr{display:flex;justify-content:space-between;gap:10px;overflow:hidden}
+  .rcard .rk{float:none;flex:0 0 auto}
+  .rcard .rv{float:none;flex:0 1 auto;min-width:0}
+}
+
+/* ═══ 2026-11-14 卡片最终形态：**竖排**（字段名一行、值一行）══════════════════════
+   为什么不用"字段名左 / 值右"：实测在 390px 下卡片右端总被挤出视口（值直接看不见），
+   排查了 `100vw`（实测=390 CSS，没问题）、`padding`、`max-width:100%`、`box-sizing`，
+   都没能让右端稳定留在屏内。竖排后**值的 x 位置与容器宽度无关**（左对齐、换行），
+   不再有"被裁掉"的可能 —— 对齐问题从"宽度之争"变成不存在。 */
+@media (max-width:680px){
+  .rcard .rr{display:block;padding:5px 0;border-top:1px dashed #f1f3f5}
+  .rcard .rr:first-of-type{border-top:0;padding-top:2px}
+  .rcard .rk{display:block;float:none;font-size:12px;color:#8b93a1;margin-bottom:1px;line-height:1.4}
+  .rcard .rv{display:block;float:none;text-align:left;font-size:14px;font-weight:600;
+             color:#23262b;line-height:1.45;overflow-wrap:anywhere}
+}
+
+@media (max-width:680px){
+  /* 卡片右端留白：实测 `.wrap` 的 padding-right 在窄屏下不起作用（左 14 生效、右 0），
+     这里在卡片容器上补一层，并把卡片右边界左移 —— 用 `margin-right` 而不是 padding，
+     因为 margin 不参与父级的宽度计算，必然生效。 */
+  .rcards{padding-right:14px}
+  .rcard{margin-right:14px}
+}
+
+@media (max-width:680px){
+  /* 显式钉死左右内边距（`padding:14px` 简写在窄屏下实测右侧失效 → 页面右边缘无留白） */
+  .wrap{padding-left:14px !important;padding-right:14px !important;box-sizing:border-box}
+  .rcards{padding-left:0 !important;padding-right:0 !important}
+}

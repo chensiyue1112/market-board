@@ -1,0 +1,141 @@
+/* trend.css — 趋势研判页（2026-11-14 v2）
+   目标：**一屏读完结论**。所以每一块都是"结论 + 少量证据"，不做大表、不做卡片墙。
+   颜色/圆角继承 theme.css 的变量。 */
+
+body.trend .wrap{max-width:1100px}
+.tdate{font-size:13px;font-weight:500;color:var(--muted);margin-left:8px;letter-spacing:0}
+
+/* ── ① 今日定性 ─────────────────────────────────────────────────────── */
+.verdict{
+  background:linear-gradient(135deg,#131a26 0%,#1d2a3f 62%,#23314a 100%);
+  color:#e8eef8;border-radius:16px;padding:16px 18px;margin:6px 0 18px;
+  box-shadow:0 8px 26px rgba(9,14,22,.24);
+}
+.verdict .vline.main{font-size:19px;font-weight:750;letter-spacing:.2px;line-height:1.5}
+.verdict .vline.sub{margin-top:7px;font-size:12.5px;color:#9fb0c6;line-height:1.8}
+.verdict .vline.sub b{color:#fff;font-weight:700}
+.verdict .up{color:#ff7b7b}
+.verdict .down{color:#4ed39a}
+.verdict .warn{color:#ffb454}
+
+/* ── ② 指数表 ───────────────────────────────────────────────────────── */
+.twrap{background:var(--surface);border:1px solid rgba(20,26,34,.06);border-radius:14px;
+       box-shadow:var(--shadow-1);overflow:hidden;margin-bottom:8px}
+table.tt{width:100%;border-collapse:collapse;font-size:13px}
+table.tt th{background:#f7f9fc;color:var(--muted);font-weight:600;font-size:11.5px;
+            letter-spacing:.4px;padding:8px 12px;text-align:right;border-bottom:1px solid var(--line)}
+table.tt th.l{text-align:left}
+table.tt td{padding:7px 12px;text-align:right;border-bottom:1px solid var(--line-2);
+            font-variant-numeric:tabular-nums;color:var(--ink-2)}
+table.tt td.l{text-align:left}
+table.tt tbody tr:last-child td{border-bottom:0}
+table.tt tbody tr:hover{background:var(--brand-soft)}
+table.tt .grp{display:inline-block;margin-left:6px;padding:0 5px;border-radius:5px;
+              background:#f1f3f7;color:var(--faint);font-size:10.5px;font-weight:400}
+.up{color:var(--up) !important}.down{color:var(--down) !important}
+.dim{color:var(--muted) !important}
+.empty{padding:20px;text-align:center;color:var(--faint)}
+
+/* ── ③ 板块归因（一行涨、一行跌，胶囊化）────────────────────────────── */
+.attr{background:var(--surface);border:1px solid rgba(20,26,34,.06);border-radius:14px;
+      box-shadow:var(--shadow-1);padding:10px 14px;margin-bottom:6px}
+.arow{display:flex;align-items:flex-start;gap:10px;padding:6px 0}
+.arow + .arow{border-top:1px dashed var(--line-2)}
+.ak{flex:0 0 26px;text-align:center;border-radius:7px;font-size:12px;font-weight:700;line-height:22px}
+.ak.up{background:var(--up-soft);color:var(--up)}
+.ak.down{background:var(--down-soft);color:var(--down)}
+.ab{display:flex;flex-wrap:wrap;gap:6px}
+.bchip{display:inline-flex;align-items:baseline;gap:5px;padding:2px 9px;border-radius:999px;
+       font-size:12.5px;font-weight:600;background:#f6f8fb;color:var(--ink-2)}
+.bchip i{font-style:normal;font-size:11.5px;font-variant-numeric:tabular-nums}
+.bchip.up{background:var(--up-soft);color:#b4232a}
+.bchip.down{background:var(--down-soft);color:#0b7a45}
+
+/* ── ④ 短线主线 ─────────────────────────────────────────────────────── */
+.judge{font-size:13.5px;color:var(--ink-2);line-height:1.75;margin:2px 0 10px}
+.judge .jl{display:inline-block;margin-right:8px;padding:1px 8px;border-radius:6px;
+           background:var(--brand-soft);color:var(--brand);font-size:11.5px;font-weight:700}
+.judge b{color:var(--ink)}
+
+.mains{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:8px}
+.mcard{background:var(--surface);border:1px solid rgba(20,26,34,.06);border-radius:13px;
+       box-shadow:var(--shadow-1);padding:12px 14px;transition:box-shadow .2s,transform .2s}
+.mcard:hover{box-shadow:var(--shadow-2);transform:translateY(-1px)}
+.mh{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.midx{width:18px;height:18px;flex:0 0 18px;border-radius:6px;background:linear-gradient(135deg,var(--brand),var(--brand-2));
+      color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.mh b{font-size:14.5px;color:var(--ink);font-weight:700}
+.mh .stag{margin-left:auto}
+.mmeta{display:flex;gap:12px;font-size:12px;color:var(--muted);margin-bottom:5px}
+.mmeta i{font-style:normal}
+.mmeta b{color:var(--ink);font-weight:750;font-variant-numeric:tabular-nums}
+.mwhy{font-size:12px;color:var(--muted)}
+.mld{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line-2);
+     font-size:12.5px;color:var(--ink-2)}
+.mld b{color:var(--up);font-weight:700}
+
+/* 阶段标签 */
+.stag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:650}
+.stag.hot{background:var(--up-soft);color:var(--up)}
+.stag.mid{background:var(--brand-soft);color:var(--brand)}
+.stag.new{background:#f1f3f7;color:var(--faint)}
+.stag.warn{background:#fff4e6;color:#b35c00}
+.stag.cool{background:#eef4ff;color:#3b6fd4}
+.stag.gray{background:#f1f3f7;color:var(--muted)}
+.stag.pseudo{background:#fff1f0;color:#c0392b;border:1px dashed #f0a9a3}
+.pnote{margin:2px 0 5px;font-size:11.5px;color:#c0392b;opacity:.85}
+
+/* ── ⑤ 隐性聚集 ─────────────────────────────────────────────────────── */
+.hbox{background:var(--surface);border:1px solid rgba(20,26,34,.06);border-radius:13px;
+      box-shadow:var(--shadow-1);padding:8px 14px;margin-bottom:6px}
+.hrow{display:flex;align-items:baseline;gap:10px;padding:7px 0}
+.hrow + .hrow{border-top:1px dashed var(--line-2)}
+.hch{font-size:20px;font-weight:800;color:var(--up);line-height:1;letter-spacing:-1px}
+.hn{font-size:12px;color:var(--ink-2);font-weight:600;flex:0 0 auto}
+.hm{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+
+/* ── ⑥ 影响因素 ─────────────────────────────────────────────────────── */
+.evwrap{background:var(--surface);border:1px solid rgba(20,26,34,.06);border-radius:14px;
+        box-shadow:var(--shadow-1);overflow:hidden;margin-bottom:18px}
+.ev{padding:11px 14px;border-top:1px solid var(--line-2)}
+.ev:first-child{border-top:0}
+.evh{font-size:13.5px;color:var(--ink);line-height:1.6;font-weight:600}
+.evk{display:inline-block;margin-right:8px;padding:1px 7px;border-radius:6px;
+     background:#f1f3f7;color:var(--muted);font-size:11px;font-weight:600;vertical-align:1px}
+.evf{display:flex;align-items:center;gap:10px;margin-top:4px;font-size:11.5px;color:var(--faint)}
+.evt{font-variant-numeric:tabular-nums}
+.evtag{margin-left:auto;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.evtag.on{background:var(--up-soft);color:var(--up)}
+.evtag.off{background:#f1f3f7;color:var(--faint)}
+.evnone{padding:16px 14px;color:var(--faint);font-size:13px;text-align:center}
+
+/* ── ⑦ 附录 ─────────────────────────────────────────────────────────── */
+.gubabox{margin:6px 0 24px;border:1px solid rgba(20,26,34,.06);border-radius:12px;
+         background:var(--surface);box-shadow:var(--shadow-1)}
+.gubabox summary{padding:11px 14px;cursor:pointer;font-size:13px;color:var(--ink-2);
+                 font-weight:600;list-style:none}
+.gubabox summary::-webkit-details-marker{display:none}
+.gubabox summary::before{content:"▸ ";color:var(--brand)}
+.gubabox[open] summary::before{content:"▾ "}
+.gubabox > div{padding:0 14px 14px}
+.gsum{margin-bottom:10px}
+.gsum b{font-size:12px;color:var(--brand)}
+.gsum p{margin:4px 0 0;font-size:13px;line-height:1.75;color:var(--ink-2)}
+.gref{padding:5px 0;border-top:1px dashed var(--line-2);font-size:13px}
+.gref a{color:var(--ink);text-decoration:none}
+.gref a:hover{color:var(--brand);text-decoration:underline}
+
+/* ── 手机 ───────────────────────────────────────────────────────────── */
+@media (max-width:680px){
+  .verdict{padding:13px 14px;border-radius:14px}
+  .verdict .vline.main{font-size:16px}
+  .verdict .vline.sub{font-size:12px}
+  table.tt{font-size:12.5px}
+  table.tt th,table.tt td{padding:6px 9px}
+  .mains{grid-template-columns:1fr}
+  .mcard{padding:10px 12px}
+  .mh b{font-size:13.5px}
+  .bchip{font-size:12px;padding:2px 8px}
+  .attr{padding:8px 11px}
+  .evh{font-size:13px}
+}
