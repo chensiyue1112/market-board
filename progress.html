@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>数据源进度</title>
+<style>
+  /* 只看进度：不解释、不加功能、不修饰 */
+  :root{--bg:#0f1216;--fg:#e6e9ee;--dim:#8b93a1;--line:#232a33;--ok:#31c48d;--run:#f0b429;--bad:#e5484d;--idle:#39414d}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+  .wrap{max-width:960px;margin:0 auto;padding:18px 16px 40px}
+  h1{font-size:17px;margin:0 0 4px}
+  .sub{color:var(--dim);font-size:12.5px;font-variant-numeric:tabular-nums}
+  .top{display:flex;gap:22px;align-items:flex-end;flex-wrap:wrap;margin:14px 0 10px}
+  .big{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+  .big span{font-size:14px;color:var(--dim);font-weight:400}
+  .bar{height:6px;background:#1b212a;border-radius:3px;overflow:hidden;margin:10px 0 18px}
+  .bar>i{display:block;height:100%;background:var(--ok);width:0;transition:width .4s}
+  .cur{background:#161b22;border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:18px}
+  .cur .lbl{font-size:13px;color:var(--dim);margin-bottom:6px}
+  .cur .num{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+  .cur .num small{font-size:13px;color:var(--dim);font-weight:400}
+  .cur .bar{margin:8px 0 0}
+  .cur .bar>i{background:var(--run)}
+  .cur .det{font-size:12.5px;color:var(--dim);margin-top:6px;font-variant-numeric:tabular-nums}
+  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);font-size:13px}
+  th{color:var(--dim);font-weight:500;font-size:12px;position:sticky;top:0;background:var(--bg)}
+  td.i{color:var(--dim);width:34px}
+  td.st{width:88px}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px;background:var(--idle)}
+  .done .dot{background:var(--ok)} .running .dot{background:var(--run)} .fail .dot{background:var(--bad)}
+  .skip .dot{background:#556}
+  tr.running{background:#161b22}
+  tr.running td{color:#fff}
+  td.det{color:var(--dim);font-size:12.5px}
+  .empty{color:var(--dim);padding:30px 0;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>数据源进度</h1>
+  <div class="sub" id="meta">…</div>
+
+  <div class="top">
+    <div class="big" id="ratio">0<span>/ 0</span></div>
+    <div class="sub" id="pct">0%</div>
+  </div>
+  <div class="bar"><i id="allbar"></i></div>
+
+  <div class="cur" id="curbox" style="display:none">
+    <div class="lbl" id="curlabel">当前</div>
+    <div class="num" id="curnum">0 <small>/ 0</small></div>
+    <div class="bar"><i id="curbar"></i></div>
+    <div class="det" id="curdet"></div>
+  </div>
+
+  <table>
+    <thead><tr><th>#</th><th>源 / 步骤</th><th>状态</th><th>明细</th></tr></thead>
+    <tbody id="rows"><tr><td colspan="4" class="empty">等待数据…</td></tr></tbody>
+  </table>
+</div>
+
+<script>
+(function () {
+  var ST = { pending: '等待', running: '进行中', done: '完成', fail: '失败', skip: '跳过' };
+
+  function get(url) {
+    return fetch(url + '?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .catch(function () { return null; });
+  }
+
+  function renderMain(d, item) {
+    if (!d || !d.steps) {
+      document.getElementById('meta').textContent = '还没有进度数据（跑一次 run_daily 就会写）';
+      return;
+    }
+    var steps = d.steps, total = d.total || steps.length;
+    var done = steps.filter(function (s) {
+      return s.state === 'done' || s.state === 'skip';
+    }).length;
+    var run = steps.filter(function (s) { return s.state === 'running'; }).length;
+    var fail = steps.filter(function (s) { return s.state === 'fail'; }).length;
+
+    document.getElementById('meta').textContent =
+      '开始 ' + (d.started || '—') + ' ｜ 更新 ' + (d.updated || '—') +
+      (d.finished ? ' ｜ 结束 ' + d.finished : '') +
+      ' ｜ 失败 ' + fail;
+    document.getElementById('ratio').innerHTML = done + '<span>/ ' + total + '</span>';
+    var pct = total ? Math.round(done * 100 / total) : 0;
+    document.getElementById('pct').textContent = pct + '%' + (run ? '（' + run + ' 个进行中）' : '');
+    document.getElementById('allbar').style.width = pct + '%';
+
+    // 当前源的内部进度（取数脚本写的）
+    var box = document.getElementById('curbox');
+    if (item && item.label && (item.total || 0) > 0) {
+      box.style.display = 'block';
+      document.getElementById('curlabel').textContent = item.label;
+      document.getElementById('curnum').innerHTML =
+        (item.done || 0) + ' <small>/ ' + item.total + '</small>';
+      document.getElementById('curbar').style.width = (item.pct || 0) + '%';
+      document.getElementById('curdet').textContent =
+        (item.detail || '') + ' ｜ ' + (item.pct || 0) + '%';
+    } else {
+      box.style.display = 'none';
+    }
+
+    var html = '';
+    for (var i = 0; i < steps.length; i++) {
+      var s = steps[i], k = s.state || 'pending';
+      html += '<tr class="' + k + '">' +
+        '<td class="i">' + (s.i || i + 1) + '</td>' +
+        '<td>' + esc(s.what || s.id || '') + '</td>' +
+        '<td class="st"><span class="dot"></span>' + (ST[k] || k) + '</td>' +
+        '<td class="det">' + esc(s.detail || '') + '</td></tr>';
+    }
+    document.getElementById('rows').innerHTML = html;
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+
+  function tick() {
+    Promise.all([get('data/progress.json'), get('data/progress_item.json')])
+      .then(function (r) { renderMain(r[0], r[1]); });
+  }
+  tick();
+  setInterval(tick, 2000);      // 2 秒一刷，够用
+})();
+</script>
+</body>
+</html>
